@@ -1,10 +1,12 @@
 package com.example.leviathan.domain;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
 @Entity
+@Getter
 public class Article {
     @Id @GeneratedValue
     private Long id;

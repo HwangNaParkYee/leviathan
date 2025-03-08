@@ -2,8 +2,10 @@ package com.example.leviathan.domain;
 
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 public class Member {
 
     @Id @GeneratedValue
