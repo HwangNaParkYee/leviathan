@@ -6,9 +6,11 @@ import java.time.LocalDate;
 
 @Entity
 public class Article {
-    @Id
+    @Id @GeneratedValue
     private Long id;
-    private Long problemNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "problemId")
+    private Problem problemId;
     private String title;
     private String content;
 
