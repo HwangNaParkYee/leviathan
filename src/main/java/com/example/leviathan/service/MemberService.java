@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,6 +38,25 @@ public class MemberService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("회원가입 중 오류가 발생했습니다.");
         }
+    }
+
+
+
+
+    @Transactional
+    public ResponseEntity<String> deleteMember(Long memberId){
+        // 1. 해당 memberId로 멤버가 존재하는지 확인
+        Optional<Member> member = memberRepository.findById(memberId);
+
+        if (!member.isPresent()) {
+            // 멤버가 존재하지 않으면 404 오류 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member not found");
+        }
+
+        // 2. 멤버가 존재하면 삭제 처리
+        memberRepository.deleteById(memberId);
+        // 3. 삭제 완료 후 성공 메시지 반환
+        return ResponseEntity.ok("Member deleted successfully");
     }
 
 
