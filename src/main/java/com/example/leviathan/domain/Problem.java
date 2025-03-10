@@ -5,9 +5,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
+@NoArgsConstructor
 public class Problem {
 
     @Id @GeneratedValue
@@ -19,14 +23,12 @@ public class Problem {
     private String question;
     private String hint;
 
-    public Problem() {};
     public Problem(Long number, String title, String question, String hint) {
         this.number = number;
         this.title = title;
         this.question = question;
         this.hint = hint;
     }
-
 
 
 }
