@@ -4,6 +4,7 @@ package com.example.leviathan.controller;
 import com.example.leviathan.dto.FindByAllProblemDTO;
 import com.example.leviathan.dto.FindProblemDTO;
 import com.example.leviathan.dto.SaveProblemDTO;
+import com.example.leviathan.dto.UpdateProblemDTO;
 import com.example.leviathan.service.ProblemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,16 @@ public class ProblemController {
         return ResponseEntity.ok(problems);
     }
 
+
+    @PutMapping("/updateProblem")
+    public ResponseEntity<String> updateProblem(@RequestBody UpdateProblemDTO dto) {
+        try {
+            problemService.updateProblem(dto);
+            return ResponseEntity.ok("Problem updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Error: " + e.getMessage());
+        }
+    }
 
 
 

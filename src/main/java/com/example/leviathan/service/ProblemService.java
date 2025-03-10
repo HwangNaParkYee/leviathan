@@ -6,6 +6,7 @@ import com.example.leviathan.domain.Problem;
 import com.example.leviathan.dto.FindByAllProblemDTO;
 import com.example.leviathan.dto.FindProblemDTO;
 import com.example.leviathan.dto.SaveProblemDTO;
+import com.example.leviathan.dto.UpdateProblemDTO;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,6 +78,40 @@ public class ProblemService {
                         0L))  // likes는 현재 0으로 설정
                 .collect(Collectors.toList());
     }
+
+
+    @Transactional
+    public Problem updateProblem(UpdateProblemDTO dto) {
+        // 문제 ID로 문제를 찾기
+        Optional<Problem> optionalProblem = problemRepository.findById(dto.getProblemId());
+
+        // 문제가 존재하지 않으면 예외 처리
+        if (optionalProblem.isEmpty()) {
+            throw new RuntimeException("Problem not found with id: " + dto.getProblemId());
+        }
+
+        // 문제 객체 가져오기
+        Problem problem = optionalProblem.get();
+
+        // 값이 null이 아니면 필드 업데이트
+        if (dto.getProblemNumber() != null) {
+            problem.setNumber(dto.getProblemNumber());
+        }
+        if (dto.getTitle() != null) {
+            problem.setTitle(dto.getTitle());
+        }
+        if (dto.getQuestion() != null) {
+            problem.setQuestion(dto.getQuestion());
+        }
+        if (dto.getHint() != null) {
+            problem.setHint(dto.getHint());
+        }
+
+        // 업데이트된 문제를 저장하고 반환
+        return problemRepository.save(problem);
+    }
+
+
 
 
 }
