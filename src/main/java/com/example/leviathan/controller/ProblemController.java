@@ -1,10 +1,7 @@
 package com.example.leviathan.controller;
 
 
-import com.example.leviathan.dto.FindByAllProblemDTO;
-import com.example.leviathan.dto.FindProblemDTO;
-import com.example.leviathan.dto.SaveProblemDTO;
-import com.example.leviathan.dto.UpdateProblemDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.service.ProblemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +46,17 @@ public class ProblemController {
             return ResponseEntity.status(400).body("Error: " + e.getMessage());
         }
     }
+
+
+    @PostMapping("/submitProblem")
+    public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemDTO dto) {
+        // 클라이언트가 보낸 problemId와 answer를 받아서 처리
+        String result = problemService.submitProblem(dto);
+
+        // 결과 리턴
+        return ResponseEntity.ok(result);
+    }
+
 
 
 
