@@ -3,18 +3,19 @@ package com.example.leviathan.service;
 
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
-import com.example.leviathan.dto.FindByAllProblemDTO;
-import com.example.leviathan.dto.FindProblemDTO;
-import com.example.leviathan.dto.SaveProblemDTO;
-import com.example.leviathan.dto.UpdateProblemDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -109,6 +110,68 @@ public class ProblemService {
 
         // 업데이트된 문제를 저장하고 반환
         return problemRepository.save(problem);
+    }
+
+
+
+    // 문제 제출 메소드
+    public String submitProblem(SubmitProblemDTO dto) {
+        String problemId = dto.getProblemId().toString();  // problemId
+        String answer = dto.getAnswer();  // answer
+
+        // 1. 문제 ID가 DB에 있는지 확인
+        Optional<Problem> problem = problemRepository.findById(dto.getProblemId());
+
+        if (problem.isEmpty()) {
+            // 문제 ID가 DB에 없으면 에러 메시지 반환
+            return "Error: Problem with ID " + dto.getProblemId() + " does not exist.";
+        }
+
+        try {
+            // Docker 이미지 이름을 동적으로 생성
+            String imageName = "problem-" + problemId;
+
+            // Docker 명령어를 실행할 환경 변수 설정
+            String command = "docker run --rm -e USER_COMMANDS=\"" + answer + "\" " + imageName;
+
+            // Docker 명령어 실행
+            Process process = Runtime.getRuntime().exec(command);
+
+            // 명령어 실행 결과 읽기 (표준 출력 + 오류 출력)
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            StringBuilder output = new StringBuilder();
+            StringBuilder errorOutput = new StringBuilder();
+            String line;
+
+            // 표준 출력 읽기
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+
+            // 오류 출력 읽기
+            while ((line = errorReader.readLine()) != null) {
+                errorOutput.append(line).append("\n");
+            }
+
+            // 프로세스 종료를 기다리기
+            int exitCode = process.waitFor();  // 종료 코드 기다리기
+            if (exitCode != 0) {
+                return "Error: Docker command failed with exit code " + exitCode + " - " + errorOutput.toString();
+            }
+
+            // 명령어 실행 결과 확인
+            String result = output.toString();
+            if (result.contains("정답입니다!")) {
+                return "Success";  // 정답일 경우
+            } else {
+                return "Fail: " + result;  // 오답일 경우, 결과도 같이 반환
+            }
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "Error during execution: " + e.getMessage();  // 실행 중 오류 발생 시
+        }
     }
 
 
