@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SaveProblemDTO {
 
-    private String number;
+    private Long number;
     private String title;
     private String question;
     private String hint;

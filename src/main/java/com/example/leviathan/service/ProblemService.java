@@ -3,6 +3,7 @@ package com.example.leviathan.service;
 
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
+import com.example.leviathan.dto.FindByAllProblemDTO;
 import com.example.leviathan.dto.FindProblemDTO;
 import com.example.leviathan.dto.SaveProblemDTO;
 import com.example.leviathan.repository.MemberRepository;
@@ -12,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +63,19 @@ public class ProblemService {
         return ResponseEntity.ok(findProblemDTO);
     }
 
+
+    // 모든 문제를 조회하여 DTO 리스트로 반환
+    public List<FindByAllProblemDTO> findByAllProblem() {
+        List<Problem> problems = problemRepository.findAll();
+
+        return problems.stream()
+                .map(problem -> new FindByAllProblemDTO(
+                        problem.getId(),
+                        problem.getNumber(),
+                        problem.getTitle(),
+                        0L))  // likes는 현재 0으로 설정
+                .collect(Collectors.toList());
+    }
 
 
 }
