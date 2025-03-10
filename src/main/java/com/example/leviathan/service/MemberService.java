@@ -2,6 +2,7 @@ package com.example.leviathan.service;
 
 
 import com.example.leviathan.domain.Member;
+import com.example.leviathan.dto.SaveProblemDTO;
 import com.example.leviathan.dto.SignUpDTO;
 import com.example.leviathan.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
