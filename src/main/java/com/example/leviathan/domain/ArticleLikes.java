@@ -2,10 +2,12 @@ package com.example.leviathan.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class ArticleLikes {
 
     @Id
@@ -14,9 +16,14 @@ public class ArticleLikes {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "articleId")
-    private Article articleId;
+    private Article article;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
-    private Member memberId;
+    private Member member;
+
+    public ArticleLikes(Article article, Member member) {
+        this.article = article;
+        this.member = member;
+    }
 }
