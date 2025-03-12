@@ -12,6 +12,5 @@ public class SaveReviewDTO {
     private Long problemId;
     private Long memberId;
     private String answer;
-    private LocalDateTime createDate;
     private boolean isRight;
 }
