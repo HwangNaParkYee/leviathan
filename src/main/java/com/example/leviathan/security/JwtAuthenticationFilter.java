@@ -1,4 +1,4 @@
-package security;
+package com.example.leviathan.security;
 
 import com.example.leviathan.service.CustomMemberDetailsService;
 import jakarta.servlet.FilterChain;

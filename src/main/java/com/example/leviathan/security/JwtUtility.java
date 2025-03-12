@@ -1,4 +1,4 @@
-package security;
+package com.example.leviathan.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
