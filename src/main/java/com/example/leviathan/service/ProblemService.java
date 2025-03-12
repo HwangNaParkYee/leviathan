@@ -136,7 +136,6 @@ public class ProblemService {
                     "sh", "-c", "docker run --rm -e USER_COMMANDS='" + answer + "' " + imageName
             };
 
-
             // Docker 명령어 실행
             Process process = Runtime.getRuntime().exec(command);
 
