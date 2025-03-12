@@ -5,12 +5,15 @@ import com.example.leviathan.domain.Member;
 import com.example.leviathan.dto.SaveProblemDTO;
 import com.example.leviathan.dto.SignUpDTO;
 import com.example.leviathan.repository.MemberRepository;
+import com.example.leviathan.security.JwtUtility;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -18,6 +21,38 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final JwtUtility jwtUtility;
+
+    //토큰으로 멤버 객체를 받아옴
+    //토큰으로 memberId가 필요하면 controller에서
+    //public ResponseEntity<List<RentDTO>> memberRentList(HttpServletRequest header){
+    //          List<RentDTO> list = itemRentService.memberRentList(jwtUtility.getStudentId(jwtUtility.resolveToken(header)));
+    //위에 요런식으로 HttpServletRequest 쓰면 괜찮을듯 아님말고...        |--------여기가 토큰으로 검증부터 ID 뽑아오는 로직임------------|
+    //별로면 말해용 바꾸면 되니까
+
+    @Transactional
+    public ResponseEntity<?> tokenToMember(HttpServletRequest request) {
+        try {
+            String token = jwtUtility.resolveToken(request);
+            String memberId = jwtUtility.getMemberId(token);
+
+            return findByMemberId(memberId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("회원 정보 조회 중 오류가 발생했습니다.");
+        }
+    }
+
+    private ResponseEntity<?> findByMemberId(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+
+        if (member != null) {
+            return ResponseEntity.ok(member);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("해당 사용자를 찾을 수 없습니다.");
+        }
+    }
 
 
     @Transactional
