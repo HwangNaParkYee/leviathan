@@ -21,4 +21,3 @@ public class Review {
     private LocalDate createDate;
     private Boolean isRight;
 }
-;
