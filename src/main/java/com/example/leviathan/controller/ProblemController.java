@@ -52,9 +52,11 @@ public class ProblemController {
 
     @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @PostMapping("/submitProblem")
-    public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemDTO dto) {
+    public ResponseEntity<String> submitProblem(
+            @RequestHeader("Authorization") String token,
+            @RequestBody SubmitProblemDTO dto) {
         // 클라이언트가 보낸 problemId와 answer를 받아서 처리
-        String result = problemService.submitProblem(dto);
+        String result = problemService.submitProblem(token, dto);
 
         // 결과 리턴
         return ResponseEntity.ok(result);
