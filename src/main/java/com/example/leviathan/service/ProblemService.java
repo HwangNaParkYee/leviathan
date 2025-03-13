@@ -8,6 +8,7 @@ import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.FavoriteRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
+import com.example.leviathan.security.JwtUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ public class ProblemService {
     private final ProblemRepository problemRepository;
     private final FavoriteRepository favoriteRepository;
     private final MemberService memberService;
+    private final JwtUtility jwtUtility;
 
 
     @Transactional
@@ -119,7 +121,16 @@ public class ProblemService {
 
 
     // 문제 제출 메소드
-    public String submitProblem(SubmitProblemDTO dto) {
+    public String submitProblem(String token, SubmitProblemDTO dto) {
+        // "Bearer " 접두사를 제거하고 실제 토큰만 추출
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);  // "Bearer "의 길이는 7이므로 그만큼 잘라냄
+        }
+        System.out.println(token);
+        if ( !jwtUtility.validateToken(token) ){
+            return "유효하지 않은 토큰";
+        }
+
         String problemId = dto.getProblemId().toString();  // problemId
         String answer = dto.getAnswer();  // answer
 
