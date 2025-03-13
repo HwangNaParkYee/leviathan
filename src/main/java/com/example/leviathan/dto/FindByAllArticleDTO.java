@@ -12,10 +12,10 @@ public class FindByAllArticleDTO {
     private LocalDate updateDate;
     private Long likes;
 
-    public FindByAllArticleDTO(Article article) {
+    public FindByAllArticleDTO(Article article, Long likes) {
         this.title = article.getTitle();
         this.memberName = article.getMemberId().getMemberId();
         this.updateDate = article.getUpdateDate();
-        // repository에서 좋아요 개수 로직 추가
+        this.likes = likes;
     }
 }

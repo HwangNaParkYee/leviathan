@@ -20,12 +20,12 @@ public class FindByProblemDTO {
     private Long commentNumbers;
     private Long likes;
 
-    public FindByProblemDTO(Article article) {
+    public FindByProblemDTO(Article article, Long likes) {
         this.problemId = article.getProblemId().getId();
         this.title = article.getTitle();
         this.memberId = article.getMemberId().getMemberId();
         this.updateDate = article.getUpdateDate();
-        // 좋아요 개수 로직 추가
+        this.likes = likes;
         // 코멘트 개수 로직 sql 추가
     }
 }
