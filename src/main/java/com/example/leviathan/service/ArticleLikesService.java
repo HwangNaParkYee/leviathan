@@ -43,12 +43,12 @@ public class ArticleLikesService {
     }
 
     @Transactional
-    public ResponseEntity<Long> countLikes(Long articleId) {
+    public Long countLikes(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
         long likesCount = articleLikesRepository.countByArticleId(article);
 
-        return ResponseEntity.ok(likesCount);
+        return likesCount;
     }
 }
