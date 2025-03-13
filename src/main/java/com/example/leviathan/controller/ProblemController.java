@@ -60,6 +60,18 @@ public class ProblemController {
         return ResponseEntity.ok(result);
     }
 
+    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
+    @PostMapping("/likeUpProblem/{problemId}")
+    public ResponseEntity<String> likeUpProblem(
+            @PathVariable Long problemId,
+            @RequestHeader("Authorization") String token) {  // 헤더에서 'Authorization' 토큰 받기
+
+            String result = problemService.likeUpProblem(token, problemId);
+            return ResponseEntity.ok(result);
+    }
+
+
+
 
 
 

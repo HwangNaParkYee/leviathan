@@ -1,9 +1,11 @@
 package com.example.leviathan.service;
 
 
+import com.example.leviathan.domain.Favorite;
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.dto.*;
+import com.example.leviathan.repository.FavoriteRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 public class ProblemService {
 
     private final ProblemRepository problemRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final MemberService memberService;
 
 
     @Transactional
@@ -176,5 +180,35 @@ public class ProblemService {
 
 
 
+
+    @Transactional
+    public String likeUpProblem(String token, Long problemId) {
+        // 토큰을 통해 Member 객체를 얻어오기
+        Member member = memberService.tokenToMember(token);
+        if (member == null) {
+            return "Error: Member with token " + token + " does not exist.";
+        }
+
+        // problemId를 통해 Problem 객체를 찾아오기 (문제에 따라 Problem 객체가 있어야 할 수도 있음)
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new RuntimeException("Problem not found"));
+
+        // 문제와 사용자가 즐겨찾기를 이미 했는지 확인
+        Optional<Favorite> favorite = favoriteRepository.findByProblemIdAndMemberId(problem, member);
+
+        if (favorite.isPresent()) {
+            // 존재하면 삭제
+            favoriteRepository.delete(favorite.get());
+            return "Favorite removed.";
+        } else {
+            // 존재하지 않으면 추가
+            Favorite newFavorite = new Favorite();
+            newFavorite.setProblemId(problem);
+            newFavorite.setMemberId(member);
+
+            favoriteRepository.save(newFavorite);
+            return "Favorite added.";
+        }
+    }
 
 }

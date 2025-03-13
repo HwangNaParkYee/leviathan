@@ -43,14 +43,39 @@ public class MemberService {
         }
     }
 
-    private ResponseEntity<?> findByMemberId(String memberId) {
+    @Transactional
+    public Member tokenToMember(String token) {
+        try {
+            // 토큰에서 memberId 추출
+            String memberId = jwtUtility.getMemberId(token);
+
+            // findByMemberId 메소드에서 ResponseEntity<Member> 반환을 받기
+            ResponseEntity<Member> response = findByMemberId(memberId);
+
+            // ResponseEntity에서 Member 객체 꺼내기
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return response.getBody();  // 성공적으로 Member 객체 반환
+            } else {
+                // 예외 처리, 404 Not Found일 경우 적절한 처리를 할 수 있습니다
+                throw new RuntimeException("해당 사용자를 찾을 수 없습니다.");
+            }
+
+        } catch (Exception e) {
+            // 예외 처리 로직 (로그 남기기 등)
+            throw new RuntimeException("회원 정보 조회 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    private ResponseEntity<Member> findByMemberId(String memberId) {
+        // DB에서 Member 찾기
         Member member = memberRepository.findByMemberId(memberId);
 
         if (member != null) {
-            return ResponseEntity.ok(member);
+            return ResponseEntity.ok(member);  // Member를 OK와 함께 반환
         } else {
+            // Member가 없을 경우 NOT_FOUND 상태와 함께 적절한 메시지 반환
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("해당 사용자를 찾을 수 없습니다.");
+                    .body(null);  // 실제로는 적절한 예외를 던지는 것이 좋습니다.
         }
     }
 
