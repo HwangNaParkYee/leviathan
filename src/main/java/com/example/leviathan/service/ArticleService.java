@@ -3,10 +3,7 @@ package com.example.leviathan.service;
 import com.example.leviathan.domain.Article;
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
-import com.example.leviathan.dto.ArticleUpdateDTO;
-import com.example.leviathan.dto.FindByAllArticleDTO;
-import com.example.leviathan.dto.FindByArticleDTO;
-import com.example.leviathan.dto.SaveArticleDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.ArticleRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
@@ -60,7 +57,7 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ResponseEntity<FindByArticleDTO> findByArticle(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다: " + articleId));
@@ -76,11 +73,14 @@ public class ArticleService {
     public ResponseEntity<List<FindByAllArticleDTO>> findByAllArticle() {
         List<Article> articles = articleRepository.findAll();
 
-        List<FindByAllArticleDTO> articleDTOS = articles.stream()
-                .map(FindByAllArticleDTO::new)
+        List<FindByAllArticleDTO> articleDTO = articles.stream()
+                .map(article -> {
+                    Long likesCount = articleLikesService.countLikes(article.getId());
+                    return new FindByAllArticleDTO(article, likesCount);
+                })
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(articleDTOS);
+        return ResponseEntity.ok(articleDTO);
     }
 
     @Transactional
@@ -103,8 +103,21 @@ public class ArticleService {
         return ResponseEntity.ok(dtos);
     }
 
-//    @Transactional(readOnly = true)
-//    public ResponseEntity<List<FindByProblemDTO>> findByProblemId(Long problemId) {
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<FindByProblemDTO>> findByProblemId(Long problemId) {
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 문제를 찾을 수 없습니다."));
 
-//    }
+        List<Article> articles = articleRepository.findByProblemId(problem);
+
+        List<FindByProblemDTO> articleDTO = articles.stream()
+                .map(article -> {
+                    Long likesCount = articleLikesService.countLikes(article.getId());
+                    return new FindByProblemDTO(article, likesCount);
+                })
+                .collect(Collectors.toList());
+        // 나중에 코멘트 개수 로직 추가
+
+        return ResponseEntity.ok(articleDTO);
+    }
 }
