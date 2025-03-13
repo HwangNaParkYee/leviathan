@@ -9,6 +9,7 @@ import com.example.leviathan.repository.FavoriteRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import com.example.leviathan.security.JwtUtility;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.http.HttpStatus;
@@ -122,17 +123,7 @@ public class ProblemService {
 
 
     // 문제 제출 메소드
-    public String submitProblem(String token, SubmitProblemDTO dto) {
-
-        // "Bearer " 접두사를 제거하고 실제 토큰만 추출
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);  // "Bearer "의 길이는 7이므로 그만큼 잘라냄
-        }
-
-        if ( !jwtUtility.validateToken(token) ){
-            return "유효하지 않은 토큰";
-        }
-
+    public String submitProblem(HttpServletRequest header, SubmitProblemDTO dto) {
 
         String problemId = dto.getProblemId().toString();  // problemId
         String answer = dto.getAnswer();  // answer
@@ -178,8 +169,8 @@ public class ProblemService {
                 return "Error: Docker command failed with exit code " + exitCode + " - " + errorOutput.toString();
             }
 
+            Member member = memberService.tokenToMember(header);
 
-            Member member = memberService.tokenToMember(token);
             // 명령어 실행 결과 확인
             String result = output.toString();
             SaveReviewDTO saveReviewDTO = new SaveReviewDTO();
@@ -207,16 +198,10 @@ public class ProblemService {
 
 
     @Transactional
-    public String likeUpProblem(String token, Long problemId) {
-        // "Bearer " 접두사를 제거하고 실제 토큰만 추출
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);  // "Bearer "의 길이는 7이므로 그만큼 잘라냄
-        }
+    public String likeUpProblem(HttpServletRequest header, Long problemId) {
+
         // 토큰을 통해 Member 객체를 얻어오기
-        Member member = memberService.tokenToMember(token);
-        if (member == null) {
-            return "Error: Member with token " + token + " does not exist.";
-        }
+        Member member = memberService.tokenToMember(header);
 
         // problemId를 통해 Problem 객체를 찾아오기 (문제에 따라 Problem 객체가 있어야 할 수도 있음)
         Problem problem = problemRepository.findById(problemId)
