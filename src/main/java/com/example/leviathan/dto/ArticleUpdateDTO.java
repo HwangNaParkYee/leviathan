@@ -9,12 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleUpdateDTO {
-    private Long id;
     private String title;
     private String content;
 
     public ArticleUpdateDTO(Article article) {
-        this.id = article.getId();
         this.title = article.getTitle();
         this.content = article.getContent();
     }

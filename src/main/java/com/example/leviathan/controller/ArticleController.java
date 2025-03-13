@@ -1,9 +1,6 @@
 package com.example.leviathan.controller;
 
-import com.example.leviathan.dto.FindByAllArticleDTO;
-import com.example.leviathan.dto.FindByArticleDTO;
-import com.example.leviathan.dto.SaveArticleDTO;
-import com.example.leviathan.dto.SaveResDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +24,19 @@ public class ArticleController {
         return articleService.findByArticle(articleId);
     }
 
+    @GetMapping("/article/findByProblemId/{problemId}")
+    public ResponseEntity<List<FindByProblemDTO>> findByProblemId(@PathVariable Long problemId) {
+        return articleService.findByProblemId(problemId);
+    }
+
     @PostMapping("/article/save")
     public ResponseEntity<SaveResDTO> save(@RequestBody SaveArticleDTO dto, String token) {
         return articleService.saveArticle(dto, token);
+    }
+
+    @PutMapping("/article/update/{articleId}")
+    public ResponseEntity<String> update(@PathVariable Long articleId, @RequestBody ArticleUpdateDTO dto, String token) {
+        return articleService.updateArticle(dto, token, articleId);
     }
 
     @DeleteMapping("/article/delete/{articleId}")
