@@ -3,10 +3,8 @@ package com.example.leviathan.service;
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.domain.Review;
-import com.example.leviathan.dto.FindByAllReviewDTO;
-import com.example.leviathan.dto.SaveArticleDTO;
+import com.example.leviathan.dto.ReviewDTO;
 import com.example.leviathan.dto.SaveReviewDTO;
-import com.example.leviathan.repository.ArticleRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import com.example.leviathan.repository.ReviewRepository;
@@ -44,11 +42,27 @@ public class ReviewService {
         return reviewRepository.save(review);
     }
 
-    public List<FindByAllReviewDTO> getAllReviews() {
+    public List<ReviewDTO> getAllReviews() {
         List<Review> reviews = reviewRepository.findAll();
         return reviews.stream()
-                .map(FindByAllReviewDTO::fromEntity)  // fromEntity()로 DTO 변환
+                .map(ReviewDTO::fromEntity)  // fromEntity()로 DTO 변환
                 .toList();
+    }
+
+    // 1. problemId로 리뷰 검색
+    public List<ReviewDTO> findByProblemIdReview(Long problemId) {
+        List<Review> reviews = reviewRepository.findByProblemId(problemId);
+        return reviews.stream().map(ReviewDTO::fromEntity).toList();
+    }
+
+    public List<ReviewDTO> findByProblemIdMemberIdReview(Long problemId, Long memberId) {
+        List<Review> reviews = reviewRepository.findByProblemIdAndMemberId(problemId, memberId);
+        return reviews.stream().map(ReviewDTO::fromEntity).toList();
+    }
+
+    public List<ReviewDTO> findByMemberIdReview(Long memberId) {
+        List<Review> reviews = reviewRepository.findByMemberId(memberId);
+        return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
 
 }

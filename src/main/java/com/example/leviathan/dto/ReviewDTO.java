@@ -6,22 +6,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FindByAllReviewDTO{
+public class ReviewDTO{
     private Long Id;
-    private Long problemId;
+    private Long problemNumber;
     private Long memberId;
     private String answer;
     private LocalDateTime createDate;
     private Long isRight;
 
-    public static FindByAllReviewDTO fromEntity(Review review) {
-        return new FindByAllReviewDTO(
+    public static ReviewDTO fromEntity(Review review) {
+        return new ReviewDTO(
                 review.getId(),
-                review.getProblemId().getId(),
+                review.getProblemId().getNumber(),
                 review.getMemberId().getId(),
                 review.getAnswer(),
                 review.getCreateDate(),
