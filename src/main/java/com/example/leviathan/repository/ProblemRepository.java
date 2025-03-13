@@ -1,6 +1,7 @@
 package com.example.leviathan.repository;
 
 import com.example.leviathan.domain.Article;
+import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import org.springframework.data.jpa.repository.JpaRepository;
 

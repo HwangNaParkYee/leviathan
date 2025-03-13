@@ -3,6 +3,7 @@ package com.example.leviathan.controller;
 
 import com.example.leviathan.dto.*;
 import com.example.leviathan.service.ProblemService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,23 +53,16 @@ public class ProblemController {
 
     @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @PostMapping("/submitProblem")
-    public ResponseEntity<String> submitProblem(
-            @RequestHeader("Authorization") String token,
-            @RequestBody SubmitProblemDTO dto) {
-        // 클라이언트가 보낸 problemId와 answer를 받아서 처리
-        String result = problemService.submitProblem(token, dto);
+    public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemDTO dto, HttpServletRequest header) {
+        String result = problemService.submitProblem(header, dto);
 
-        // 결과 리턴
         return ResponseEntity.ok(result);
     }
 
     @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @PostMapping("/likeUpProblem/{problemId}")
-    public ResponseEntity<String> likeUpProblem(
-            @PathVariable Long problemId,
-            @RequestHeader("Authorization") String token) {  // 헤더에서 'Authorization' 토큰 받기
-
-            String result = problemService.likeUpProblem(token, problemId);
+    public ResponseEntity<String> likeUpProblem( @PathVariable Long problemId, HttpServletRequest header){  // 헤더에서 'Authorization' 토큰 받기
+            String result = problemService.likeUpProblem(header, problemId);
             return ResponseEntity.ok(result);
     }
 

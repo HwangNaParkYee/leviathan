@@ -8,6 +8,7 @@ import com.example.leviathan.dto.SaveReviewDTO;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import com.example.leviathan.repository.ReviewRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +23,9 @@ import java.util.stream.Collectors;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ProblemRepository problemRepository;
+//    private final ProblemService problemService; 사용하지 말죠 순환참조 발생함
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Transactional
     public Review saveReview(SaveReviewDTO saveReviewDTO) {
@@ -49,19 +52,29 @@ public class ReviewService {
                 .toList();
     }
 
+    //Problem_id로 problem 반환하기 순환참조 때문에 ReviewService에 만들었음
+    public Problem findByProblemId(Long problemId) {
+        return problemRepository.findById(problemId)
+                .orElseThrow(() -> new IllegalArgumentException("문제 ID가 존재하지 않습니다: " + problemId));
+    }
+
     // 1. problemId로 리뷰 검색
     public List<ReviewDTO> findByProblemIdReview(Long problemId) {
-        List<Review> reviews = reviewRepository.findByProblemId(problemId);
+        Problem problem = findByProblemId(problemId);
+        List<Review> reviews = reviewRepository.findByProblemId(problem);
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
 
-    public List<ReviewDTO> findByProblemIdMemberIdReview(Long problemId, Long memberId) {
-        List<Review> reviews = reviewRepository.findByProblemIdAndMemberId(problemId, memberId);
+    public List<ReviewDTO> findByProblemIdMemberIdReview(Long problemId, HttpServletRequest header) {
+        Member member = memberService.tokenToMember(header);
+        Problem problem = findByProblemId(problemId);
+        List<Review> reviews = reviewRepository.findByProblemIdAndMemberId(problem, member);
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
 
-    public List<ReviewDTO> findByMemberIdReview(Long memberId) {
-        List<Review> reviews = reviewRepository.findByMemberId(memberId);
+    public List<ReviewDTO> findByMemberIdReview(HttpServletRequest header) {
+        Member member = memberService.tokenToMember(header);
+        List<Review> reviews = reviewRepository.findByMemberId(member);
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
 
