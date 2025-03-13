@@ -3,6 +3,7 @@ package com.example.leviathan.service;
 import com.example.leviathan.domain.Article;
 import com.example.leviathan.domain.ArticleLikes;
 import com.example.leviathan.domain.Member;
+import com.example.leviathan.dto.ArticleLikesDTO;
 import com.example.leviathan.repository.ArticleLikesRepository;
 import com.example.leviathan.repository.ArticleRepository;
 import com.example.leviathan.repository.MemberRepository;
@@ -21,7 +22,7 @@ public class ArticleLikesService {
     private final JwtUtility jwtUtility;
 
     @Transactional
-    public ResponseEntity<String> toggleLike(Long articleId, String token) {
+    public ResponseEntity<ArticleLikesDTO> toggleLike(Long articleId, String token) {
         // 사용자 찾기
         Member member = memberRepository.findByMemberId(jwtUtility.getMemberId(token));
 
@@ -34,11 +35,11 @@ public class ArticleLikesService {
 
         if(liked) {
             articleLikesRepository.deleteByArticleIdAndMemberId(article, member);
-            return ResponseEntity.ok("좋아요가 취소되었습니다.");
+            return ResponseEntity.ok(new ArticleLikesDTO(article));
         } else {
             ArticleLikes newLike = new ArticleLikes(article, member);
             articleLikesRepository.save(newLike);
-            return ResponseEntity.ok("좋아요가 추가되었습니다.");
+            return ResponseEntity.ok(new ArticleLikesDTO(article));
         }
     }
 
