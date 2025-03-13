@@ -27,6 +27,7 @@ public class ArticleService {
     private final MemberRepository memberRepository;
     private final JwtUtility jwtUtility;
     private final ProblemRepository problemRepository;
+    private final ArticleLikesService articleLikesService;
 
     @Transactional
     public ResponseEntity<String> saveArticle(SaveArticleDTO dto, String token) {
@@ -65,7 +66,8 @@ public class ArticleService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다: " + articleId));
 
         // DTO 생성자 사용으로 간결하게 처리
-        FindByArticleDTO dto = new FindByArticleDTO(article);
+        Long likesCount = articleLikesService.countLikes(articleId);
+        FindByArticleDTO dto = new FindByArticleDTO(article, likesCount);
 
         return ResponseEntity.ok(dto);
     }
@@ -93,9 +95,11 @@ public class ArticleService {
             return ResponseEntity.status(403).body(null);       // 권한이 없을 경우 상태코드 403 반환
         }
 
+        Long likeCount = articleLikesService.countLikes(article.getId());
+
         article.updateArticle(dto.getTitle(), dto.getContent());
 
-        FindByArticleDTO dtos = new FindByArticleDTO(article);
+        FindByArticleDTO dtos = new FindByArticleDTO(article, likeCount);
         return ResponseEntity.ok(dtos);
     }
 

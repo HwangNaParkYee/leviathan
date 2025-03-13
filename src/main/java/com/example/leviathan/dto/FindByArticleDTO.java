@@ -19,12 +19,12 @@ public class FindByArticleDTO {
     private Long likes;
     private LocalDate updateDate;
 
-    public FindByArticleDTO(Article article) {
+    public FindByArticleDTO(Article article, Long likes) {
         this.problemNumber = article.getProblemId().getNumber();
         this.title = article.getTitle();
         this.content = article.getContent();
         this.memberName = article.getMemberId().getMemberId();
-        // Likes-Repository에서 계산하는 로직 필요
+        this.likes = likes;
         this.updateDate = article.getUpdateDate();
     }
 }
