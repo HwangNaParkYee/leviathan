@@ -1,6 +1,7 @@
 package com.example.leviathan.controller;
 
 
+import com.example.leviathan.dto.LoginDTO;
 import com.example.leviathan.dto.SignUpDTO;
 import com.example.leviathan.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -28,5 +29,10 @@ public class MemberController {
     }
 
 
+    @GetMapping("login")
+    public ResponseEntity<String> login(@RequestBody LoginDTO dto){
+
+        return memberService.login(dto);
+    }
 
 }
