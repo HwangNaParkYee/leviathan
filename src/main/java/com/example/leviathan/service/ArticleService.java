@@ -27,7 +27,7 @@ public class ArticleService {
     private final ArticleLikesService articleLikesService;
 
     @Transactional
-    public ResponseEntity<String> saveArticle(SaveArticleDTO dto, String token) {
+    public ResponseEntity<SaveResDTO> saveArticle(SaveArticleDTO dto, String token) {
         // 토큰을 이용하여 member 조회
         Member member = memberRepository.findByMemberId(jwtUtility.getMemberId(token));
 
@@ -39,12 +39,14 @@ public class ArticleService {
         // 4. 저장
         articleRepository.save(article);
 
+        SaveResDTO resDTO = new SaveResDTO(article.getProblemId().getNumber(), article.getTitle(), article.getContent());
+
         // 5. 성공 응답 반환
-        return ResponseEntity.ok("게시글이 성공적으로 저장되었습니다.");
+        return ResponseEntity.ok(resDTO);
     }
 
     @Transactional
-    public void deleteArticle(String token, Long articleId) {
+    public void deleteArticle(Long articleId, String token) {
         Member member = memberRepository.findByMemberId(jwtUtility.getMemberId(token));
 
         Article article = articleRepository.findById(articleId)
