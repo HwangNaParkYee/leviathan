@@ -2,6 +2,7 @@ package com.example.leviathan.service;
 
 
 import com.example.leviathan.domain.Member;
+import com.example.leviathan.dto.LoginDTO;
 import com.example.leviathan.dto.SaveProblemDTO;
 import com.example.leviathan.dto.SignUpDTO;
 import com.example.leviathan.repository.MemberRepository;
@@ -98,6 +99,20 @@ public class MemberService {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("회원가입 중 오류가 발생했습니다.");
+        }
+    }
+
+
+
+    public ResponseEntity<String> login(LoginDTO dto){
+
+        Member member = memberRepository.findByMemberId((dto.getMemberId()));
+        if (member != null && member.getPassword().equals(dto.getPassword())) {
+            String token = jwtUtility.generateToken(dto.getMemberId());
+            return ResponseEntity.ok(token);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("로그인 오류!!");
         }
     }
 
