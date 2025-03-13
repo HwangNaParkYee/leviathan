@@ -25,5 +25,5 @@ public class Review {
 
     private String answer;
     private LocalDateTime createDate;
-    private Boolean isRight;
+    private Long isRight;
 }

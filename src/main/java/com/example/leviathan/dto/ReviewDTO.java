@@ -15,7 +15,7 @@ public class ReviewDTO{
     private Long memberId;
     private String answer;
     private LocalDateTime createDate;
-    private boolean isRight;
+    private Long isRight;
 
     public static ReviewDTO fromEntity(Review review) {
         return new ReviewDTO(

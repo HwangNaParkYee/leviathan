@@ -32,6 +32,7 @@ public class ProblemService {
     private final FavoriteRepository favoriteRepository;
     private final MemberService memberService;
     private final JwtUtility jwtUtility;
+    private final ReviewService reviewService;
 
 
     @Transactional
@@ -122,14 +123,16 @@ public class ProblemService {
 
     // 문제 제출 메소드
     public String submitProblem(String token, SubmitProblemDTO dto) {
+
         // "Bearer " 접두사를 제거하고 실제 토큰만 추출
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);  // "Bearer "의 길이는 7이므로 그만큼 잘라냄
         }
-        System.out.println(token);
+
         if ( !jwtUtility.validateToken(token) ){
             return "유효하지 않은 토큰";
         }
+
 
         String problemId = dto.getProblemId().toString();  // problemId
         String answer = dto.getAnswer();  // answer
@@ -175,11 +178,22 @@ public class ProblemService {
                 return "Error: Docker command failed with exit code " + exitCode + " - " + errorOutput.toString();
             }
 
+
+            Member member = memberService.tokenToMember(token);
             // 명령어 실행 결과 확인
             String result = output.toString();
+            SaveReviewDTO saveReviewDTO = new SaveReviewDTO();
+            saveReviewDTO.setProblemId(dto.getProblemId());
+            saveReviewDTO.setMemberId( member.getId() );
+            saveReviewDTO.setAnswer(answer);
+
             if (result.contains("정답입니다!")) {
+                saveReviewDTO.setIsRight(1L);
+                reviewService.saveReview(saveReviewDTO); // 최적화 필요 현재 두개로 나눠짐
                 return "Success";  // 정답일 경우
             } else {
+                reviewService.saveReview(saveReviewDTO);
+                saveReviewDTO.setIsRight(0L);
                 return "Fail: " + result;  // 오답일 경우, 결과도 같이 반환
             }
 
@@ -194,6 +208,10 @@ public class ProblemService {
 
     @Transactional
     public String likeUpProblem(String token, Long problemId) {
+        // "Bearer " 접두사를 제거하고 실제 토큰만 추출
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);  // "Bearer "의 길이는 7이므로 그만큼 잘라냄
+        }
         // 토큰을 통해 Member 객체를 얻어오기
         Member member = memberService.tokenToMember(token);
         if (member == null) {
