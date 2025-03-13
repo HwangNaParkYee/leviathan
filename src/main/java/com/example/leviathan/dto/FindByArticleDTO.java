@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FindByArticleDTO {
+    private Long articleId;
     private Long problemNumber;
     private String title;
     private String content;
@@ -20,6 +21,7 @@ public class FindByArticleDTO {
     private LocalDate updateDate;
 
     public FindByArticleDTO(Article article, Long likes) {
+        this.articleId = article.getId();
         this.problemNumber = article.getProblemId().getNumber();
         this.title = article.getTitle();
         this.content = article.getContent();
