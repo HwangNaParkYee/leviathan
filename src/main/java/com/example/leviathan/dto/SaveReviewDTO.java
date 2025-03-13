@@ -12,5 +12,5 @@ public class SaveReviewDTO {
     private Long problemId;
     private Long memberId;
     private String answer;
-    private boolean isRight;
+    private Long isRight;
 }

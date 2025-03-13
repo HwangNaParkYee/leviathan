@@ -44,6 +44,7 @@ public class JwtUtility {
 
     // JWT 유효성 검증
     public boolean validateToken(String token) {
+
         try {
             Jwts.parser()
                     .setSigningKey(secretKey)

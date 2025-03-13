@@ -16,7 +16,7 @@ public class FindByAllReviewDTO{
     private Long memberId;
     private String answer;
     private LocalDateTime createDate;
-    private boolean isRight;
+    private Long isRight;
 
     public static FindByAllReviewDTO fromEntity(Review review) {
         return new FindByAllReviewDTO(

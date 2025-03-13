@@ -39,7 +39,7 @@ public class ReviewService {
         review.setMemberId(member);
         review.setAnswer(saveReviewDTO.getAnswer());
         review.setCreateDate(LocalDateTime.now());
-        review.setIsRight(saveReviewDTO.isRight());
+        review.setIsRight(saveReviewDTO.getIsRight());
 
         return reviewRepository.save(review);
     }
