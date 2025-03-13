@@ -86,9 +86,9 @@ public class ArticleService {
     }
 
     @Transactional
-    public ResponseEntity<FindByArticleDTO> updateArticle(ArticleUpdateDTO dto, String token) {
-        Article article = articleRepository.findById(dto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다." + dto.getId()));
+    public ResponseEntity<String> updateArticle(ArticleUpdateDTO dto, String token, Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
         // 토큰으로 멤버 확인하기
         Member member = memberRepository.findByMemberId(jwtUtility.getMemberId(token));
@@ -102,7 +102,7 @@ public class ArticleService {
         article.updateArticle(dto.getTitle(), dto.getContent());
 
         FindByArticleDTO dtos = new FindByArticleDTO(article, likeCount);
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok("게시물이 수정되었습니다.");
     }
 
     @Transactional(readOnly = true)
