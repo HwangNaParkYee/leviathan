@@ -8,6 +8,7 @@ import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.FavoriteRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
+import com.example.leviathan.repository.ReviewRepository;
 import com.example.leviathan.security.JwtUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class ProblemService {
     private final MemberService memberService;
     private final JwtUtility jwtUtility;
     private final ReviewService reviewService;
+    private final ReviewRepository reviewRepository;
 
 
     @Transactional
@@ -75,22 +77,60 @@ public class ProblemService {
     }
 
 
-    // 모든 문제를 조회하여 DTO 리스트로 반환
     public List<FindByAllProblemDTO> findByAllProblem() {
+        // 모든 문제 조회
         List<Problem> problems = problemRepository.findAll();
 
         return problems.stream()
                 .map(problem -> {
-                    long likes = favoriteRepository.countByProblemId(problem); // Favorite 테이블에서 문제에 대한 좋아요 개수 조회
+                    long likes = favoriteRepository.countByProblemId(problem);
+
+                    // 해당 문제를 푼 첫 번째 답안 가져오기 (리스트가 null일 수 있으므로 체크)
+                    List<Object[]> firstReviews = reviewRepository.findFirstReviewByProblem(problem.getId());
+
+                    // 첫 번째 답안을 푼 사람 수 및 맞힌 사람 수 계산
+                    long totalSolvers = 0;
+                    long correctSolvers = 0;
+                    Long previousMemberId = null;
+
+                    // firstReviews가 null이거나 빈 리스트인 경우 처리
+                    if (firstReviews != null) {
+                        for (Object[] reviewData : firstReviews) {
+                            // Object 배열에서 데이터 추출
+                            Long memberId = (Long) reviewData[0]; // 사용자 ID
+                            Long isRight = (Long) reviewData[1];   // 정답 여부를 Long으로 처리
+
+                            // isRight가 null이면 0으로 처리
+                            if (isRight == null) {
+                                isRight = 0L;
+                            }
+
+                            // 중복된 사용자가 아닌 경우에만 계산
+                            if (previousMemberId == null || !previousMemberId.equals(memberId)) {
+                                totalSolvers++;
+                                if (isRight == 1L) {  // Long 타입으로 비교
+                                    correctSolvers++;
+                                }
+                                previousMemberId = memberId;  // 이전 사용자의 ID를 기록
+                            }
+                        }
+                    }
+
+                    // 정답률 계산 (0으로 나누지 않도록)
+                    Double correctRate = totalSolvers == 0 ? 0.0 : (double) correctSolvers / totalSolvers * 100;
+
+                    // DTO 반환
                     return new FindByAllProblemDTO(
                             problem.getId(),
                             problem.getNumber(),
                             problem.getTitle(),
-                            likes // likes 값으로 가져온 개수 설정
+                            likes,  // 좋아요 개수
+                            correctRate // 정답률
                     );
                 })
                 .collect(Collectors.toList());
     }
+
 
 
     @Transactional
