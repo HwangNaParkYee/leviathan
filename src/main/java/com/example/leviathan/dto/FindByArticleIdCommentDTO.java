@@ -14,4 +14,5 @@ public class FindByArticleIdCommentDTO {
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+    private long likeCount;
 }

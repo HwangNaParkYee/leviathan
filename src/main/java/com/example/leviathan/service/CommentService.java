@@ -6,6 +6,7 @@ import com.example.leviathan.dto.FindByArticleIdCommentDTO;
 import com.example.leviathan.dto.UpdateCommentDTO;
 import com.example.leviathan.dto.saveCommentDTO;
 import com.example.leviathan.repository.ArticleRepository;
+import com.example.leviathan.repository.CommentLikesRepository;
 import com.example.leviathan.repository.CommentRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ public class CommentService {
     private CommentRepository commentRepository;
     private ArticleRepository articleRepository;
     private MemberService memberService;
+    private CommentLikesRepository commentLikesRepository;
+
 
     //댓글 달기
     @Transactional
@@ -92,7 +95,9 @@ public class CommentService {
                         comment.getMemberId().getId(),
                         comment.getContent(),
                         comment.getCreateDate(),
-                        comment.getUpdateDate()))
+                        comment.getUpdateDate(),
+                        commentLikesRepository.countByComment(comment)
+                ))
                 .toList();
     }
 
