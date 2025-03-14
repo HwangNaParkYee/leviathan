@@ -79,7 +79,7 @@ public class CommentService {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
-        return commentRepository.countByArticleId(articleId);
+        return commentRepository.countByArticleId(article);
     }
 
     public List<FindByArticleIdCommentDTO> getCommentsByArticleId(Long articleId) {
