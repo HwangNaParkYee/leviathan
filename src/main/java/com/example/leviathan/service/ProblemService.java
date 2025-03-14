@@ -123,10 +123,14 @@ public class ProblemService {
 
 
     // 문제 제출 메소드
+    @Transactional
     public String submitProblem(HttpServletRequest header, SubmitProblemDTO dto) {
-
         String problemId = dto.getProblemId().toString();  // problemId
         String answer = dto.getAnswer();  // answer
+
+
+        System.out.println(header);
+        System.out.println(dto);
 
         // 1. 문제 ID가 DB에 있는지 확인
         Optional<Problem> problem = problemRepository.findById(dto.getProblemId());

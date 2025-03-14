@@ -27,7 +27,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
 
-    @Transactional
+    @Transactional(readOnly = false)
     public Review saveReview(SaveReviewDTO saveReviewDTO) {
         Problem problem = problemRepository.findById(saveReviewDTO.getProblemId())
                 .orElseThrow(() -> new RuntimeException("문제 못 찾음"));
@@ -35,13 +35,8 @@ public class ReviewService {
         Member member = memberRepository.findById(saveReviewDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("멤버 못 찾음"));
 
-        Review review = new Review();
-        review.setProblemId(problem);
-        review.setMemberId(member);
-        review.setAnswer(saveReviewDTO.getAnswer());
-        review.setCreateDate(LocalDateTime.now());
-        review.setIsRight(saveReviewDTO.getIsRight());
-
+        Review review = new Review(problem, member, saveReviewDTO.getAnswer(), saveReviewDTO.getIsRight());
+        System.out.println(" 잘 왔어요 !!~~~~~~~~~~~~" + review);
         return reviewRepository.save(review);
     }
 
