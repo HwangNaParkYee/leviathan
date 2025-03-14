@@ -51,15 +51,4 @@ public class CommentService {
 
         return commentRepository.save(comment);
     }
-
-    // 게시물에 대한 댓글 개수 반환
-    @Transactional
-    public Long getCommentCount(Long articleId) {
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
-
-        Long commentCount = commentRepository.countByArticleId(articleId);
-
-        return commentCount;
-    }
 }
