@@ -78,4 +78,18 @@ public class ReviewService {
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
 
+    public double getProblemAccuracy(Long problemId) {
+
+        Problem problem = findByProblemId(problemId);
+        // 전체 제출 횟수
+        long totalSubmissions = reviewRepository.countByProblemId(problem);
+        if (totalSubmissions == 0) {
+            return 0.0; // 제출된 데이터가 없으면 정답률 0%
+        }
+        // 정답 횟수 (isRight = 1인 경우)
+        long correctSubmissions = reviewRepository.countByProblemIdAndIsRight(problem, 1L);
+        // 정답률 계산
+        return ((double) correctSubmissions / totalSubmissions) * 100;
+    }
+
 }
