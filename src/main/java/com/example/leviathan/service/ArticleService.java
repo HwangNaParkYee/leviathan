@@ -80,7 +80,7 @@ public class ArticleService {
         List<FindByAllArticleDTO> articleDTO = articles.stream()
                 .map(article -> {
                     Long likesCount = articleLikesService.countLikes(article.getId());
-                    Long commentsCount = commentRepository.countByArticleId(article.getId());
+                    Long commentsCount = commentRepository.countByArticleId(article); // ✅ Article 객체로 변경
                     return new FindByAllArticleDTO(article, likesCount, commentsCount);
                 })
                 .collect(Collectors.toList());
@@ -118,7 +118,7 @@ public class ArticleService {
         List<FindByProblemDTO> articleDTO = articles.stream()
                 .map(article -> {
                     Long likesCount = articleLikesService.countLikes(article.getId());
-                    Long commentsCount = commentRepository.countByArticleId(article.getId());
+                    Long commentsCount = commentRepository.countByArticleId(article);
                     return new FindByProblemDTO(article, likesCount, commentsCount);
                 })
                 .collect(Collectors.toList());
