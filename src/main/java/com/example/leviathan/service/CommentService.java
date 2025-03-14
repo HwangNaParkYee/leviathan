@@ -8,6 +8,7 @@ import com.example.leviathan.repository.ArticleRepository;
 import com.example.leviathan.repository.CommentRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,5 +38,16 @@ public class CommentService {
         comment.setUpdateDate(LocalDateTime.now());
 
         return commentRepository.save(comment);
+    }
+
+    // 게시물에 대한 댓글 개수 반환
+    @Transactional
+    public Long getCommentCount(Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+
+        Long commentCount = commentRepository.countByArticleId(articleId);
+
+        return commentCount;
     }
 }
