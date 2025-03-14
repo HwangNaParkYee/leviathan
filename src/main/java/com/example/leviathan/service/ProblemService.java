@@ -80,11 +80,15 @@ public class ProblemService {
         List<Problem> problems = problemRepository.findAll();
 
         return problems.stream()
-                .map(problem -> new FindByAllProblemDTO(
-                        problem.getId(),
-                        problem.getNumber(),
-                        problem.getTitle(),
-                        0L))  // likes는 현재 0으로 설정
+                .map(problem -> {
+                    long likes = favoriteRepository.countByProblemId(problem); // Favorite 테이블에서 문제에 대한 좋아요 개수 조회
+                    return new FindByAllProblemDTO(
+                            problem.getId(),
+                            problem.getNumber(),
+                            problem.getTitle(),
+                            likes // likes 값으로 가져온 개수 설정
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
