@@ -78,7 +78,7 @@ public class ReviewService {
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
 
-    public double getProblemAccuracy(Long problemId) {
+    public double createCorrectRate(Long problemId) {
 
         Problem problem = findByProblemId(problemId);
         // 전체 제출 횟수
