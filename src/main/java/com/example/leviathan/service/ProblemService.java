@@ -121,8 +121,73 @@ public class ProblemService {
     }
 
 
+    public String runProblem(HttpServletRequest header, SubmitProblemDTO dto) {
+        String problemId = dto.getProblemId().toString();  // problemId
+        String answer = dto.getAnswer();  // answer
 
-    // 문제 제출 메소드
+
+        System.out.println(header);
+        System.out.println(dto);
+
+        // 1. 문제 ID가 DB에 있는지 확인
+        Optional<Problem> problem = problemRepository.findById(dto.getProblemId());
+
+        if (problem.isEmpty()) {
+            // 문제 ID가 DB에 없으면 에러 메시지 반환
+            return "Error: Problem with ID " + dto.getProblemId() + " does not exist.";
+        }
+
+        try {
+            // Docker 이미지 이름을 동적으로 생성
+            String imageName = "problem-" + problemId + "-test";
+
+            // Docker 명령어를 실행할 환경 변수 설정
+            String command = "docker run --rm -e USER_COMMANDS=\"" + answer + "\" " + imageName;
+
+
+            System.out.println(command + "   -------------------------");
+
+            // Docker 명령어 실행
+            Process process = Runtime.getRuntime().exec(command);
+
+            // 명령어 실행 결과 읽기 (표준 출력 + 오류 출력)
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            StringBuilder output = new StringBuilder();
+            StringBuilder errorOutput = new StringBuilder();
+            String line;
+
+            // 표준 출력 읽기
+            while ((line = reader.readLine()) != null) {
+                output.append(line).append("\n");
+            }
+
+            // 오류 출력 읽기
+            while ((line = errorReader.readLine()) != null) {
+                errorOutput.append(line).append("\n");
+            }
+
+            // 프로세스 종료를 기다리기
+            int exitCode = process.waitFor();  // 종료 코드 기다리기
+            if (exitCode != 0) {
+                return "Error: Docker command failed with exit code " + exitCode + " - " + errorOutput.toString();
+            }
+
+            // 명령어 실행 결과 확인
+            String result = output.toString();
+
+            return result;
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return "Error during execution: " + e.getMessage();  // 실행 중 오류 발생 시
+        }
+    }
+
+
+
+
+        // 문제 제출 메소드
     @Transactional
     public String submitProblem(HttpServletRequest header, SubmitProblemDTO dto) {
         String problemId = dto.getProblemId().toString();  // problemId

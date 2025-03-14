@@ -51,6 +51,16 @@ public class ProblemController {
         }
     }
 
+    // run과 submit을 분리해보려고 함 interective 문제 때문에
+    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
+    @PostMapping("/runProblem")
+    public ResponseEntity<String> runProblem(@RequestBody SubmitProblemDTO dto, HttpServletRequest header) {
+        String result = problemService.runProblem(header, dto);
+        return ResponseEntity.ok(result);
+    }
+    
+    
+    
     @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @PostMapping("/submitProblem")
     public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemDTO dto, HttpServletRequest header) {
