@@ -2,6 +2,7 @@ package com.example.leviathan.service;
 
 
 import com.example.leviathan.domain.*;
+import com.example.leviathan.dto.FindByArticleIdCommentDTO;
 import com.example.leviathan.dto.UpdateCommentDTO;
 import com.example.leviathan.dto.saveCommentDTO;
 import com.example.leviathan.repository.ArticleRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -75,6 +77,23 @@ public class CommentService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
         return commentRepository.countByArticleId(articleId);
+    }
+
+    public List<FindByArticleIdCommentDTO> getCommentsByArticleId(Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다. ID: " + articleId));
+
+        List<Comment> comments = commentRepository.findByArticleId(article);
+
+        return comments.stream()
+                .map(comment -> new FindByArticleIdCommentDTO(
+                        comment.getId(),
+                        comment.getArticleId().getId(),
+                        comment.getMemberId().getId(),
+                        comment.getContent(),
+                        comment.getCreateDate(),
+                        comment.getUpdateDate()))
+                .toList();
     }
 
 
