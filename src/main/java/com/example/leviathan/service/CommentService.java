@@ -22,6 +22,7 @@ public class CommentService {
     private ArticleRepository articleRepository;
     private MemberService memberService;
 
+    //댓글 달기
     @Transactional
     public Comment saveComment(saveCommentDTO dto, HttpServletRequest header) {
 
@@ -35,6 +36,7 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
+    //댓글 업데이트
     @Transactional
     public Comment updateComment(Long commentId, UpdateCommentDTO dto, HttpServletRequest header) {
         Member member = memberService.tokenToMember(header);
@@ -52,14 +54,28 @@ public class CommentService {
         return commentRepository.save(comment);
     }
 
+    @Transactional
+    public void deleteComment(Long commentId, HttpServletRequest header) {
+        Member member = memberService.tokenToMember(header); // JWT에서 현재 로그인한 사용자 정보 가져오기
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다. ID: " + commentId));
+
+        if (!comment.getMemberId().getId().equals(member.getId())) {
+            throw new RuntimeException("댓글을 삭제할 권한이 없습니다.");
+        }
+
+        commentRepository.delete(comment); // 댓글 삭제
+    }
+
     // 게시물에 대한 댓글 개수 반환
     @Transactional
     public Long getCommentCount(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
-        Long commentCount = commentRepository.countByArticleId(articleId);
-
-        return commentCount;
+        return commentRepository.countByArticleId(articleId);
     }
+
+
 }
