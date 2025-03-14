@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class saveCommentDTO{
-    private String token;
     private Long articleId;
     private String content;
 }
