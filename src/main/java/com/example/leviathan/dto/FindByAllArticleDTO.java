@@ -14,11 +14,12 @@ public class FindByAllArticleDTO {
     private Long likes;
     private Long commentsNumber;
 
-    public FindByAllArticleDTO(Article article, Long likes) {
+    public FindByAllArticleDTO(Article article, Long likes, Long commentsNumber) {
         this.id = article.getId();
         this.title = article.getTitle();
         this.memberName = article.getMemberId().getMemberId();
         this.updateDate = article.getUpdateDate();
         this.likes = likes;
+        this.commentsNumber = commentsNumber;
     }
 }

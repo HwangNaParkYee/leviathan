@@ -5,6 +5,7 @@ import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.ArticleRepository;
+import com.example.leviathan.repository.CommentRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import com.example.leviathan.security.JwtUtility;
@@ -25,6 +26,7 @@ public class ArticleService {
     private final JwtUtility jwtUtility;
     private final ProblemRepository problemRepository;
     private final ArticleLikesService articleLikesService;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public ResponseEntity<SaveResDTO> saveArticle(SaveArticleDTO dto, String token) {
@@ -78,7 +80,8 @@ public class ArticleService {
         List<FindByAllArticleDTO> articleDTO = articles.stream()
                 .map(article -> {
                     Long likesCount = articleLikesService.countLikes(article.getId());
-                    return new FindByAllArticleDTO(article, likesCount);
+                    Long commentsCount = commentRepository.countByArticleId(article.getId());
+                    return new FindByAllArticleDTO(article, likesCount, commentsCount);
                 })
                 .collect(Collectors.toList());
 
@@ -115,7 +118,8 @@ public class ArticleService {
         List<FindByProblemDTO> articleDTO = articles.stream()
                 .map(article -> {
                     Long likesCount = articleLikesService.countLikes(article.getId());
-                    return new FindByProblemDTO(article, likesCount);
+                    Long commentsCount = commentRepository.countByArticleId(article.getId());
+                    return new FindByProblemDTO(article, likesCount, commentsCount);
                 })
                 .collect(Collectors.toList());
         // 나중에 코멘트 개수 로직 추가
