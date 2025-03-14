@@ -2,15 +2,13 @@ package com.example.leviathan.service;
 
 
 import com.example.leviathan.domain.*;
-import com.example.leviathan.dto.FindByArticleIdCommentDTO;
-import com.example.leviathan.dto.UpdateCommentDTO;
-import com.example.leviathan.dto.saveCommentDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.ArticleRepository;
 import com.example.leviathan.repository.CommentLikesRepository;
 import com.example.leviathan.repository.CommentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,29 +19,28 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private CommentRepository commentRepository;
-    private ArticleRepository articleRepository;
-    private MemberService memberService;
-    private CommentLikesRepository commentLikesRepository;
+    private final CommentRepository commentRepository;
+    private final ArticleRepository articleRepository;
+    private final MemberService memberService;
+    private final CommentLikesRepository commentLikesRepository;
 
 
     //댓글 달기
     @Transactional
-    public Comment saveComment(saveCommentDTO dto, HttpServletRequest header) {
-
+    public CommentDTO saveComment(SaveCommentDTO dto, HttpServletRequest header) {
         Member member = memberService.tokenToMember(header);
-
         Article article = articleRepository.findById(dto.getArticleId())
-                .orElseThrow(() -> new RuntimeException("게시글 못 찾음"));
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: ID=" + dto.getArticleId()));
 
         Comment comment = new Comment(article, member, dto.getContent(), LocalDateTime.now(), LocalDateTime.now());
+        Comment savedComment = commentRepository.save(comment);
 
-        return commentRepository.save(comment);
+        return new CommentDTO(savedComment);
     }
 
     //댓글 업데이트
     @Transactional
-    public Comment updateComment(Long commentId, UpdateCommentDTO dto, HttpServletRequest header) {
+    public CommentResponseDTO updateComment(Long commentId, UpdateCommentDTO dto, HttpServletRequest header) {
         Member member = memberService.tokenToMember(header);
 
         Comment comment = commentRepository.findById(commentId)
@@ -56,7 +53,7 @@ public class CommentService {
         comment.setContent(dto.getContent());
         comment.setUpdateDate(LocalDateTime.now());
 
-        return commentRepository.save(comment);
+        return new CommentResponseDTO(commentRepository.save(comment));
     }
 
     @Transactional
