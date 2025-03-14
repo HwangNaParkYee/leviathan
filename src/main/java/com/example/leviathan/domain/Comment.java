@@ -1,12 +1,14 @@
 package com.example.leviathan.domain;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
-@Getter
+@Data
 public class Comment {
     @Id @GeneratedValue
     private int id;
@@ -20,7 +22,7 @@ public class Comment {
     private Member memberId;
 
     private String content;
-    private LocalDate createDate;
-    private LocalDate updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 
 }
