@@ -2,9 +2,7 @@ package com.example.leviathan.controller;
 
 
 import com.example.leviathan.domain.Comment;
-import com.example.leviathan.dto.FindByArticleIdCommentDTO;
-import com.example.leviathan.dto.UpdateCommentDTO;
-import com.example.leviathan.dto.saveCommentDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.service.CommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,14 +20,14 @@ public class CommentController {
 
     //댓글 달기
     @PostMapping("/save")
-    public ResponseEntity<Comment> saveComment(
-            @RequestBody saveCommentDTO dto, HttpServletRequest header) {
+    public ResponseEntity<CommentDTO> saveComment(
+            @RequestBody SaveCommentDTO dto, HttpServletRequest header) {
         return ResponseEntity.ok(commentService.saveComment(dto, header));
     }
 
     //댓글 수정
     @PutMapping("/update/{commentId}")
-    public ResponseEntity<Comment> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDTO dto, HttpServletRequest header) {
+    public ResponseEntity<CommentResponseDTO> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDTO dto, HttpServletRequest header) {
         return ResponseEntity.ok(commentService.updateComment(commentId, dto, header));
     }
 

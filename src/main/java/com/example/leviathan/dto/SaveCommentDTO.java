@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class saveCommentDTO{
+public class SaveCommentDTO {
     private Long articleId;
     private String content;
 }
