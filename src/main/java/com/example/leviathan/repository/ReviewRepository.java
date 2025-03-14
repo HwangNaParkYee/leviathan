@@ -4,10 +4,19 @@ import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.domain.Review;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+
+    @Query("SELECT r.memberId.id, r.isRight " +
+            "FROM Review r " +
+            "WHERE r.problemId.id = :problemId " +
+            "ORDER BY r.memberId.id, r.createDate ASC")
+    List<Object[]> findFirstReviewByProblem(@Param("problemId") Long problemId);
+
 
     List<Review> findByProblemId(Problem problemId);
 

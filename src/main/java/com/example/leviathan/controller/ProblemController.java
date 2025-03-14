@@ -76,9 +76,4 @@ public class ProblemController {
             return ResponseEntity.ok(result);
     }
 
-
-
-
-
-
 }
