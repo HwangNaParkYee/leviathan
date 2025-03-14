@@ -29,4 +29,11 @@ public class CommentController {
     public ResponseEntity<Comment> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentDTO dto, HttpServletRequest header) {
         return ResponseEntity.ok(commentService.updateComment(commentId, dto, header));
     }
+
+    //댓글 삭제
+    @DeleteMapping("/delete/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId, HttpServletRequest header) {
+        commentService.deleteComment(commentId, header);
+        return ResponseEntity.noContent().build(); // 204 No Content 반환
+    }
 }
