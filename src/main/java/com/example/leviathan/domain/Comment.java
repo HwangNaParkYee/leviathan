@@ -25,4 +25,11 @@ public class Comment {
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
 
+    public Comment(Article article, Member member, String content, LocalDateTime createDate, LocalDateTime updateDate) {
+        this.articleId = article;
+        this.memberId = member;
+        this.content = content;
+        this.createDate = createDate;
+        this.updateDate = updateDate;
+    }
 }
