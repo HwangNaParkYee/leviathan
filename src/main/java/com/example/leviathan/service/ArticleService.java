@@ -9,6 +9,7 @@ import com.example.leviathan.repository.CommentRepository;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import com.example.leviathan.security.JwtUtility;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ArticleService {
     private final ArticleRepository articleRepository;
     private final MemberRepository memberRepository;
@@ -27,16 +29,18 @@ public class ArticleService {
     private final ProblemRepository problemRepository;
     private final ArticleLikesService articleLikesService;
     private final CommentRepository commentRepository;
+    private final MemberService memberService;
 
     @Transactional
-    public ResponseEntity<SaveResDTO> saveArticle(SaveArticleDTO dto, String token) {
+    public ResponseEntity<SaveResDTO> saveArticle(HttpServletRequest header, SaveArticleDTO dto) {
         // 토큰을 이용하여 member 조회
-        Member member = memberRepository.findByMemberId(jwtUtility.getMemberId(token));
+        Member member = memberService.tokenToMember(header);
 
-        Problem problem = problemRepository.findByNumber(dto.getNumber());
+
+        Problem problem = problemRepository.findById(dto.getProblemId()).orElse(null);
 
         // 3. Article 엔티티 생성
-        Article article = new Article(problem, dto.getTitle(), dto.getQuestion(), member);
+        Article article = new Article(problem, dto.getTitle(), dto.getContent(), member);
 
         // 4. 저장
         articleRepository.save(article);
@@ -47,9 +51,11 @@ public class ArticleService {
         return ResponseEntity.ok(resDTO);
     }
 
+
+
     @Transactional
-    public void deleteArticle(Long articleId, String token) {
-        Member member = memberRepository.findByMemberId(jwtUtility.getMemberId(token));
+    public void deleteArticle(HttpServletRequest header, Long articleId) {
+        Member member = memberService.tokenToMember(header);
 
         Article article = articleRepository.findById(articleId)
                         .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
@@ -61,54 +67,62 @@ public class ArticleService {
         articleRepository.delete(article);
     }
 
-    @Transactional(readOnly = true)
-    public ResponseEntity<FindByArticleDTO> findByArticle(Long articleId) {
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다: " + articleId));
 
-        // DTO 생성자 사용으로 간결하게 처리
-        Long likesCount = articleLikesService.countLikes(articleId);
-        FindByArticleDTO dto = new FindByArticleDTO(article, likesCount);
-
-        return ResponseEntity.ok(dto);
-    }
-
-    @Transactional(readOnly = true)
-    public ResponseEntity<List<FindByAllArticleDTO>> findByAllArticle() {
-        List<Article> articles = articleRepository.findAll();
-
-        List<FindByAllArticleDTO> articleDTO = articles.stream()
-                .map(article -> {
-                    Long likesCount = articleLikesService.countLikes(article.getId());
-                    Long commentsCount = commentRepository.countByArticleId(article); // ✅ Article 객체로 변경
-                    return new FindByAllArticleDTO(article, likesCount, commentsCount);
-                })
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(articleDTO);
-    }
 
     @Transactional
-    public ResponseEntity<String> updateArticle(ArticleUpdateDTO dto, String token, Long articleId) {
+    public ResponseEntity<String> updateArticle(HttpServletRequest header, ArticleUpdateDTO dto, Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
         // 토큰으로 멤버 확인하기
-        Member member = memberRepository.findByMemberId(jwtUtility.getMemberId(token));
+        Member member = memberService.tokenToMember(header);
 
         if(!article.getMemberId().getId().equals(member.getId())) {
             return ResponseEntity.status(403).body(null);       // 권한이 없을 경우 상태코드 403 반환
         }
 
-        Long likeCount = articleLikesService.countLikes(article.getId());
-
         article.updateArticle(dto.getTitle(), dto.getContent());
+        articleRepository.save(article);
 
-        FindByArticleDTO dtos = new FindByArticleDTO(article, likeCount);
         return ResponseEntity.ok("게시물이 수정되었습니다.");
     }
 
-    @Transactional(readOnly = true)
+
+    public ResponseEntity<FindByArticleDTO> findByArticle(Long articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글을 찾을 수 없습니다: " + articleId));
+
+        // DTO 생성자 사용으로 간결하게 처리
+        Long likesCount = articleLikesService.countLikes(article);
+        FindByArticleDTO dto = new FindByArticleDTO(article, likesCount);
+
+        return ResponseEntity.ok(dto);
+    }
+
+
+
+    public ResponseEntity<List<FindByAllArticleDTO>> findByAllArticle() {
+        List<Article> articles = articleRepository.findAll();
+
+        List<FindByAllArticleDTO> articleDTO = articles.stream()
+                .map(article -> {
+                    Long likesCount = articleLikesService.countLikes(article);
+                    Long commentsCount = commentRepository.countByArticleId(article); // ✅ Article 객체로 변경
+
+                    // Create and return a FindByAllArticleDTO for each article
+                    return new FindByAllArticleDTO(
+                            article,             // Assuming content or other fields
+                            likesCount,                        // The number of likes
+                            commentsCount                      // The number of comments
+                    );
+                })
+                .collect(Collectors.toList());
+
+
+        return ResponseEntity.ok(articleDTO);
+    }
+
+
     public ResponseEntity<List<FindByProblemDTO>> findByProblemId(Long problemId) {
         Problem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 문제를 찾을 수 없습니다."));
@@ -117,12 +131,15 @@ public class ArticleService {
 
         List<FindByProblemDTO> articleDTO = articles.stream()
                 .map(article -> {
-                    Long likesCount = articleLikesService.countLikes(article.getId());
+                    Long likesCount = articleLikesService.countLikes(article);
                     Long commentsCount = commentRepository.countByArticleId(article);
                     return new FindByProblemDTO(article, likesCount, commentsCount);
                 })
                 .collect(Collectors.toList());
         // 나중에 코멘트 개수 로직 추가
+
+        System.out.println(articleDTO + " ----------------------");
+
 
         return ResponseEntity.ok(articleDTO);
     }

@@ -274,10 +274,9 @@ public class ProblemService {
     }
 
 
-
-
     @Transactional
     public String likeUpProblem(HttpServletRequest header, Long problemId) {
+
 
         // 토큰을 통해 Member 객체를 얻어오기
         Member member = memberService.tokenToMember(header);
