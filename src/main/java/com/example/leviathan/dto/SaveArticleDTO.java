@@ -9,15 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SaveArticleDTO {
-    private Long number;
+    private Long problemId;
     private String title;
-    private String question;
-    private String hint;
+    private String content;
 
-    public SaveArticleDTO(Article article) {
-        this.number = article.getProblemId().getNumber();
-        this.title = article.getTitle();
-        this.question = article.getProblemId().getQuestion();
-        this.hint = article.getProblemId().getHint();
-    }
 }
