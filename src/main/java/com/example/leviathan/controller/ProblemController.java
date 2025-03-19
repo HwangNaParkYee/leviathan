@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}) // React 앱 주소 허용
 public class ProblemController {
 
     private final ProblemService problemService;
@@ -21,25 +22,16 @@ public class ProblemController {
         return problemService.saveProblem(dto);
     }
 
-
-    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @GetMapping("/findProblem/{problemId}")
     public ResponseEntity<FindProblemDTO> findProblem(@PathVariable Long problemId){
-
         return problemService.findProblem(problemId);
     }
 
-
-    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @GetMapping("/findByAllProblem")
     public ResponseEntity<List<FindByAllProblemDTO>> findByAllProblem(){
-        // 서비스에서 모든 문제를 조회하여 DTO 리스트로 반환
         List<FindByAllProblemDTO> problems = problemService.findByAllProblem();
-
-        // List를 ResponseEntity로 감싸서 반환
         return ResponseEntity.ok(problems);
     }
-
 
     @PutMapping("/updateProblem")
     public ResponseEntity<String> updateProblem(@RequestBody UpdateProblemDTO dto) {
@@ -51,29 +43,21 @@ public class ProblemController {
         }
     }
 
-    // run과 submit을 분리해보려고 함 interective 문제 때문에
-    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @PostMapping("/runProblem")
     public ResponseEntity<String> runProblem(@RequestBody SubmitProblemDTO dto, HttpServletRequest header) {
         String result = problemService.runProblem(header, dto);
         return ResponseEntity.ok(result);
     }
-    
-    
-    
-    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
+
     @PostMapping("/submitProblem")
     public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemDTO dto, HttpServletRequest header) {
         String result = problemService.submitProblem(header, dto);
-
         return ResponseEntity.ok(result);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
     @PostMapping("/likeUpProblem/{problemId}")
-    public ResponseEntity<String> likeUpProblem( @PathVariable Long problemId, HttpServletRequest header){  // 헤더에서 'Authorization' 토큰 받기
-            String result = problemService.likeUpProblem(header, problemId);
-            return ResponseEntity.ok(result);
+    public ResponseEntity<String> likeUpProblem( @PathVariable Long problemId, HttpServletRequest header){
+        String result = problemService.likeUpProblem(header, problemId);
+        return ResponseEntity.ok(result);
     }
-
 }
