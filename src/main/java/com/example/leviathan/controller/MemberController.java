@@ -4,6 +4,7 @@ package com.example.leviathan.controller;
 import com.example.leviathan.dto.LoginDTO;
 import com.example.leviathan.dto.SignUpDTO;
 import com.example.leviathan.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,13 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
 
     private final MemberService memberService;
+
+
+    @GetMapping("/getMemberId")
+    public ResponseEntity<String> getMemberId(HttpServletRequest header) {
+        return memberService.tokenToMemberId(header);
+    }
+
 
     @PostMapping("/signUp")
     public ResponseEntity<String> signUp(@RequestBody SignUpDTO dto){

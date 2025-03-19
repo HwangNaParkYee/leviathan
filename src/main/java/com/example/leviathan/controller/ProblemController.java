@@ -22,7 +22,7 @@ public class ProblemController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
+    @CrossOrigin(origins = "http://localhost:5173")  // React 앱 주소
     @GetMapping("/findProblem/{problemId}")
     public ResponseEntity<FindProblemDTO> findProblem(@PathVariable Long problemId){
 
@@ -30,7 +30,8 @@ public class ProblemController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:3000")  // React 앱 주소
+
+    @CrossOrigin(origins = "http://localhost:5173")  // React 앱 주소
     @GetMapping("/findByAllProblem")
     public ResponseEntity<List<FindByAllProblemDTO>> findByAllProblem(){
         // 서비스에서 모든 문제를 조회하여 DTO 리스트로 반환
