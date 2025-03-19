@@ -26,7 +26,11 @@ public class MemberService {
     private final PasswordService passwordService;
 
     public ResponseEntity<String> tokenToMemberId (HttpServletRequest request) {
+
+        System.out.println(jwtUtility.resolveToken(request) + " token값 입니다.!! ---------");
+
         Member member = findByMemberId(jwtUtility.getMemberId(jwtUtility.resolveToken(request)));
+
 
         if (member != null) {
             return ResponseEntity.ok(member.getMemberId());

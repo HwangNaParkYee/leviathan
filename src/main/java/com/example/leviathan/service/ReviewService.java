@@ -8,8 +8,10 @@ import com.example.leviathan.dto.SaveReviewDTO;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import com.example.leviathan.repository.ReviewRepository;
+import com.example.leviathan.security.JwtUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class ReviewService {
 //    private final ProblemService problemService; 사용하지 말죠 순환참조 발생함
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final JwtUtility jwtUtility;
 
     @Transactional(readOnly = false)
     public Review saveReview(SaveReviewDTO saveReviewDTO) {
@@ -85,6 +88,19 @@ public class ReviewService {
         long correctSubmissions = reviewRepository.countByProblemIdAndIsRight(problem, 1L);
         // 정답률 계산
         return ((double) correctSubmissions / totalSubmissions) * 100;
+    }
+
+
+
+    public ResponseEntity<ReviewDTO> findByReviewId(HttpServletRequest header, Long reviewId) {
+
+        if ( !jwtUtility.validateToken(  jwtUtility.resolveToken(header) )){
+            return ResponseEntity.badRequest().body(new ReviewDTO());
+        }
+
+        Review review = reviewRepository.findById(reviewId).orElseThrow( ()-> new RuntimeException("doesnt have review"));
+        return ResponseEntity.ok(ReviewDTO.fromEntity(review));
+
     }
 
 }

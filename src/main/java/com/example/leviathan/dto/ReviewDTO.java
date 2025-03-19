@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ReviewDTO{
     private Long Id;
+    private Long problemId;
     private Long problemNumber;
-    private Long memberId;
+    private String memberId;
     private String answer;
     private LocalDateTime createDate;
     private Long isRight;
@@ -20,8 +21,9 @@ public class ReviewDTO{
     public static ReviewDTO fromEntity(Review review) {
         return new ReviewDTO(
                 review.getId(),
+                review.getProblemId().getId(),
                 review.getProblemId().getNumber(),
-                review.getMemberId().getId(),
+                review.getMemberId().getMemberId(),
                 review.getAnswer(),
                 review.getCreateDate(),
                 review.getIsRight()
