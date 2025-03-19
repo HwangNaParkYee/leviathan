@@ -48,4 +48,15 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.findByMemberIdReview(header));
     }
 
+
+    // reviewId 기준 리뷰 조회
+    @GetMapping("/detail/{detailId}")
+    public ResponseEntity<ReviewDTO> getReviewById(
+            HttpServletRequest header,
+            @PathVariable Long detailId) {
+
+        return reviewService.findByReviewId(header, detailId);
+    }
+
+
 }
