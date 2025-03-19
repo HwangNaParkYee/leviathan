@@ -25,6 +25,18 @@ public class MemberService {
     private final JwtUtility jwtUtility;
     private final PasswordService passwordService;
 
+    public ResponseEntity<String> tokenToMemberId (HttpServletRequest request) {
+        Member member = findByMemberId(jwtUtility.getMemberId(jwtUtility.resolveToken(request)));
+
+        if (member != null) {
+            return ResponseEntity.ok(member.getMemberId());
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("토큰이 유효하지 않거나 존재하지 않습니다.");
+        }
+    }
+
+
+
     //토큰으로 멤버객체 가져옴
     public Member tokenToMember(HttpServletRequest request) {
         Member member = findByMemberId(jwtUtility.getMemberId(jwtUtility.resolveToken(request)));
