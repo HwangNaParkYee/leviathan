@@ -23,6 +23,7 @@ import java.util.Optional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtUtility jwtUtility;
+    private final PasswordService passwordService;
 
     //토큰으로 멤버객체 가져옴
     public Member tokenToMember(HttpServletRequest request) {
@@ -49,18 +50,21 @@ public class MemberService {
     }
 
     @Transactional
-    public ResponseEntity<String> signUp(SignUpDTO dto){
+    public ResponseEntity<String> signUp(SignUpDTO dto) {
 
-        try{
-            // 비밀번호 암호화 필요
+        try {
             // 중복 확인
-            Member member = memberRepository.findByMemberId((dto.getMemberId()));
+            Member member = memberRepository.findByMemberId(dto.getMemberId());
             if (member != null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("이미 사용 중인 회원 ID입니다.");
             } else {
-                // 새로운 회원 저장
-                memberRepository.save(new Member(dto.getMemberId(), dto.getPassword()));
+                // 비밀번호 암호화
+                String encryptedPassword = passwordService.encodePassword(dto.getPassword());
+
+                // 새로운 회원 저장 (암호화된 비밀번호로 저장)
+                memberRepository.save(new Member(dto.getMemberId(), encryptedPassword));
+
                 return ResponseEntity.ok("회원가입 성공");
             }
         } catch (Exception e) {
@@ -71,15 +75,19 @@ public class MemberService {
 
 
 
-    public ResponseEntity<String> login(LoginDTO dto){
+    public ResponseEntity<String> login(LoginDTO dto) {
+        // 사용자 ID로 회원 정보를 찾음
+        Member member = memberRepository.findByMemberId(dto.getMemberId());
 
-        Member member = memberRepository.findByMemberId((dto.getMemberId()));
-        if (member != null && member.getPassword().equals(dto.getPassword())) {
+        // 회원이 존재하고, 비밀번호가 일치하는지 확인
+        if (member != null && passwordService.matches(dto.getPassword(), member.getPassword())) {
+            // 비밀번호가 맞다면 JWT 토큰을 생성
             String token = jwtUtility.generateToken(dto.getMemberId());
             return ResponseEntity.ok(token);
-        }else{
+        } else {
+            // 비밀번호 불일치 또는 회원이 없는 경우
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("로그인 오류!!");
+                    .body("로그인 오류!! 아이디 또는 비밀번호가 잘못되었습니다.");
         }
     }
 

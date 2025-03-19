@@ -23,15 +23,16 @@ public class MemberController {
     public ResponseEntity<String> deleteMember(@PathVariable Long memberId){
 
         // 토근 검증 로직도 나중에 구현 현재는 개발중이라 보류
-        
         // memberService에서 삭제 로직 수행
         return memberService.deleteMember(memberId);
     }
 
 
-    @GetMapping("login")
+    @CrossOrigin(origins = "http://localhost:5173")
+    @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDTO dto){
 
+        System.out.println( dto.getMemberId() + " " + dto.getPassword());
         return memberService.login(dto);
     }
 
