@@ -17,6 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/reviews")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000", "https://localhost:5143"}) // React 앱 허용
 public class ReviewController {
 
     private final ReviewService reviewService;
