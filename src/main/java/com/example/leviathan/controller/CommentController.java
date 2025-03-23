@@ -20,8 +20,7 @@ public class CommentController {
 
     //댓글 달기
     @PostMapping("/save")
-    public ResponseEntity<CommentDTO> saveComment(
-            @RequestBody SaveCommentDTO dto, HttpServletRequest header) {
+    public ResponseEntity<CommentDTO> saveComment( @RequestBody SaveCommentDTO dto, HttpServletRequest header) {
         return ResponseEntity.ok(commentService.saveComment(dto, header));
     }
 

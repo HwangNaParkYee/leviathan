@@ -12,5 +12,6 @@ public class SaveArticleDTO {
     private Long problemId;
     private String title;
     private String content;
+    private String code;
 
 }

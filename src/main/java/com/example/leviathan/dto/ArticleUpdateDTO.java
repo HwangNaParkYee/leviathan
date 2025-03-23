@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class ArticleUpdateDTO {
     private String title;
     private String content;
+    private String code;
 
     public ArticleUpdateDTO(Article article) {
         this.title = article.getTitle();

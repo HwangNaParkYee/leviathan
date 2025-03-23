@@ -17,6 +17,7 @@ public class Article {
     private Problem problemId;
     private String title;
     private String content;
+    private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
@@ -24,18 +25,20 @@ public class Article {
     private LocalDate createDate;
     private LocalDate updateDate;
 
-    public Article(Problem problemId, String title, String content, Member memberId) {
+    public Article(Problem problemId, String title, String content,String code, Member memberId) {
         this.problemId = problemId;
         this.title = title;
         this.content = content;
+        this.code = code;
         this.memberId = memberId;
         this.createDate = LocalDate.now();
         this.updateDate = this.createDate;
     }
 
-    public void updateArticle(String title, String content) {
+    public void updateArticle(String title, String content, String code) {
         this.title = title;
         this.content = content;
+        this.code = code;
         this.updateDate = LocalDate.now();
     }
 }
