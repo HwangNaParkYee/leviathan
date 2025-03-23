@@ -27,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String path = request.getRequestURI();
         if (!path.startsWith("/admin") && !path.startsWith("/member")) {
-            // 경로가 /admin/** 또는 /item-rent/**가 아닌 경우, 필터를 통과시킴
+            // 경로가 /admin/** 또는 /member/** 가 아닌 경우, 필터를 통과시킴
             // 우선 이러면 다 앵간하면 다 통과될듯 오류나면 나에게 연락하도록 - 준범
             filterChain.doFilter(request, response);
             return;
