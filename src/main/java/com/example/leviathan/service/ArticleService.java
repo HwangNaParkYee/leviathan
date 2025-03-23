@@ -36,8 +36,7 @@ public class ArticleService {
         // 토큰을 이용하여 member 조회
         Member member = memberService.tokenToMember(header);
 
-
-        Problem problem = problemRepository.findById(dto.getProblemId()).orElse(null);
+        Problem problem = problemRepository.findByNumber(dto.getProblemId());
 
         // 3. Article 엔티티 생성
         Article article = new Article(problem, dto.getTitle(), dto.getContent(), dto.getCode(), member);
