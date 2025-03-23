@@ -23,7 +23,7 @@ public class FindByProblemDTO {
 
     public FindByProblemDTO(Article article, Long likes, Long commentNumbers) {
         this.id = article.getId();
-        this.problemId = article.getProblemId().getId();
+        this.problemId = article.getProblemId().getNumber();
         this.title = article.getTitle();
         this.memberId = article.getMemberId().getMemberId();
         this.updateDate = article.getUpdateDate();

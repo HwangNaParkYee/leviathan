@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class FindByArticleIdCommentDTO {
     private Long id;
     private Long articleId;
-    private Long memberId;
+    private String memberId;
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;

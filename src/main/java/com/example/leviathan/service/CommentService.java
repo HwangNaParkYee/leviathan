@@ -79,6 +79,7 @@ public class CommentService {
         return commentRepository.countByArticleId(article);
     }
 
+    //댓글 찾기
     public List<FindByArticleIdCommentDTO> getCommentsByArticleId(Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다. ID: " + articleId));
@@ -89,7 +90,7 @@ public class CommentService {
                 .map(comment -> new FindByArticleIdCommentDTO(
                         comment.getId(),
                         comment.getArticleId().getId(),
-                        comment.getMemberId().getId(),
+                        comment.getMemberId().getMemberId(),
                         comment.getContent(),
                         comment.getCreateDate(),
                         comment.getUpdateDate(),
@@ -97,6 +98,4 @@ public class CommentService {
                 ))
                 .toList();
     }
-
-
 }

@@ -40,7 +40,7 @@ public class ArticleService {
         Problem problem = problemRepository.findById(dto.getProblemId()).orElse(null);
 
         // 3. Article 엔티티 생성
-        Article article = new Article(problem, dto.getTitle(), dto.getContent(), member);
+        Article article = new Article(problem, dto.getTitle(), dto.getContent(), dto.getCode(), member);
 
         // 4. 저장
         articleRepository.save(article);
@@ -81,7 +81,7 @@ public class ArticleService {
             return ResponseEntity.status(403).body(null);       // 권한이 없을 경우 상태코드 403 반환
         }
 
-        article.updateArticle(dto.getTitle(), dto.getContent());
+        article.updateArticle(dto.getTitle(), dto.getContent(), dto.getCode());
         articleRepository.save(article);
 
         return ResponseEntity.ok("게시물이 수정되었습니다.");
