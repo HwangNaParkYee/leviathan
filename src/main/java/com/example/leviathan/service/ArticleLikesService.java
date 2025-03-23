@@ -54,4 +54,25 @@ public class ArticleLikesService {
 
         return likesCount;
     }
+
+    public ResponseEntity<String> findByArticleIdMemberArticleLike(HttpServletRequest header, Long articleId) {
+        Member member = memberService.tokenToMember(header);
+
+        if (member == null){
+            return ResponseEntity.ok("사용자 없음");
+        }
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+
+        Optional<ArticleLikes> articleLikes = articleLikesRepository.findByArticleIdAndMemberId(article.getId(), member.getId());
+
+
+        if(articleLikes.isPresent()) {
+            return ResponseEntity.ok("좋아요 있음");
+        } else {
+            ArticleLikes newLike = new ArticleLikes(article, member);
+            return ResponseEntity.ok("좋아요 없음");
+        }
+    }
 }
