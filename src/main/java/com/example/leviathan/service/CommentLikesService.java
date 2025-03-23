@@ -39,6 +39,26 @@ public class CommentLikesService {
                 });
     }
 
+    public boolean toggleLikeCheck(Long commentId, HttpServletRequest header) {
+        Member member;
+        try {
+            member = memberService.tokenToMember(header); // JWT에서 사용자 정보 추출
+        } catch (Exception e) {
+            throw new RuntimeException("사용자 정보를 가져올 수 없습니다. (토큰 확인 필요)", e);
+        }
+
+        if (member == null) {
+            throw new RuntimeException("로그인한 사용자만 좋아요 가능.");
+        }
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다. ID: " + commentId));
+
+        // 좋아요 없으면 true, 좋아요 있으면 false
+        return commentLikesRepository.findByCommentAndMember(comment, member).isEmpty();
+    }
+
+
     //좋아요 갯수 카운트
     public long getCommentLikeCount(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
