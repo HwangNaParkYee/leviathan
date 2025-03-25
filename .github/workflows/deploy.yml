@@ -2,7 +2,7 @@ name: Deploy Spring Boot to EC2 (with secure application.yml)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ deploy ]
 
 jobs:
   build-and-deploy:
