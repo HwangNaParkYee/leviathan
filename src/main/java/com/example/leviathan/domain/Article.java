@@ -19,6 +19,8 @@ public class Article {
     private String content;
     private String code;
 
+
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private Member memberId;
