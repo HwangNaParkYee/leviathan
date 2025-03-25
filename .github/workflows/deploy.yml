@@ -48,7 +48,8 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         source: "build/libs/*.jar"
-        target: "/home/ubuntu/app"
+        target: "/home/ubuntu/app/"
+        strip_components: 2
 
     - name: 📄 Upload application.yml to EC2
       uses: appleboy/scp-action@v0.1.3
