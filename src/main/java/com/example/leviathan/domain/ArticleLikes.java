@@ -18,6 +18,7 @@ public class ArticleLikes {
     @JoinColumn(name = "articleId")
     private Article article;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private Member member;
