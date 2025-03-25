@@ -36,4 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-*.yml
+# .gitignore
+*.yml                    # 모든 .yml 무시
+!/.github/workflows/*.yml  # 근데 이 경로는 예외 처리 (GitHub Actions용)
