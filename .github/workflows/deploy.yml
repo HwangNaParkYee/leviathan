@@ -19,7 +19,9 @@ jobs:
         distribution: 'temurin'
 
     - name: 🛠️ Build with Gradle
-      run: chmod +x gradlew ./gradlew clean build -x test
+      run: |
+        chmod +x ./gradlew
+        ./gradlew clean build -x test
 
     - name: 🔐 Generate application.yml from secrets
       run: |
