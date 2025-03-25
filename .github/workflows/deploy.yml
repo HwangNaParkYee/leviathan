@@ -57,7 +57,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         source: "config/application.yml"
-        target: "/home/ubuntu/config"
+        target: "/home/ubuntu/config/application.yml"
 
     - name: 🚀 Restart Spring Boot on EC2
       uses: appleboy/ssh-action@v1.0.0
