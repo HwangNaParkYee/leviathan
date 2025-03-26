@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/article")
+@RequestMapping("/api/article")
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleService articleService;

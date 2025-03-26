@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"}) // React 앱 주소 허용
+@RequestMapping("/api")
 public class ProblemController {
 
     private final ProblemService problemService;

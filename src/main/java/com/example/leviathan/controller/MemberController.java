@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173") // React에서 API 요청 허용
+@RequestMapping("/api")
 public class MemberController {
 
     private final MemberService memberService;
