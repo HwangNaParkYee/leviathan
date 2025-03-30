@@ -3,8 +3,7 @@ package com.example.leviathan.service;
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.domain.Review;
-import com.example.leviathan.dto.ReviewDTO;
-import com.example.leviathan.dto.SaveReviewDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.MemberRepository;
 import com.example.leviathan.repository.ProblemRepository;
 import com.example.leviathan.repository.ReviewRepository;
@@ -102,5 +101,53 @@ public class ReviewService {
         return ResponseEntity.ok(ReviewDTO.fromEntity(review));
 
     }
+
+    //멤버 별로 맞은 문제 가져오기
+    public List<SolvedProblemDTO> findSolvedProblems(HttpServletRequest request) {
+        Member member = memberService.tokenToMember(request);
+
+        List<Review> solvedReviews = reviewRepository.findByMemberIdAndIsRight(member, 1L);
+
+        return solvedReviews.stream()
+                .map(review -> new SolvedProblemDTO(review.getProblemId().getNumber()))
+                .distinct()
+                .toList();
+    }
+
+    //멤버 별로 틀린 문제 가져오기
+    public List<SolvedProblemDTO> findWrongProblems(HttpServletRequest request) {
+        Member member = memberService.tokenToMember(request);
+
+        List<Long> problemIds = reviewRepository.findWrongProblemIdsByMember(member);
+
+        return problemIds.stream()
+                .map(SolvedProblemDTO::new)
+                .toList();
+    }
+
+    //잔디용
+    public List<ActivityHistoryDTO> getActivityHistory(HttpServletRequest request) {
+        Member member = memberService.tokenToMember(request);
+
+        List<Object[]> results = reviewRepository.countSolvedProblemsPerDay(member);
+
+        return results.stream()
+                .map(row -> new ActivityHistoryDTO(
+                        row[0].toString(),      // 날짜
+                        (Long) row[1]))         // 개수
+                .toList();
+    }
+
+    //총 푼 문제 갯수, 도전한 문제 갯수, 제출 횟수
+    public MyPageStatisticsDTO getStatistics(HttpServletRequest request) {
+        Member member = memberService.tokenToMember(request);
+
+        Long totalSolved = reviewRepository.countDistinctSolvedProblems(member);
+        Long totalTried = reviewRepository.countDistinctTriedProblems(member);
+        Long totalSubmissions = reviewRepository.countAllSubmissions(member);
+
+        return new MyPageStatisticsDTO(totalSolved, totalTried, totalSubmissions);
+    }
+
 
 }
