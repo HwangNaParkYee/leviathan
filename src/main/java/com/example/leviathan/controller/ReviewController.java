@@ -1,8 +1,7 @@
 package com.example.leviathan.controller;
 
 import com.example.leviathan.domain.Member;
-import com.example.leviathan.dto.ReviewDTO;
-import com.example.leviathan.dto.SaveReviewDTO;
+import com.example.leviathan.dto.*;
 import com.example.leviathan.service.MemberService;
 import com.example.leviathan.service.ReviewService;
 import com.example.leviathan.security.JwtUtility;
@@ -51,11 +50,33 @@ public class ReviewController {
     // reviewId 기준 리뷰 조회
     @GetMapping("/detail/{detailId}")
     public ResponseEntity<ReviewDTO> getReviewById(
-            HttpServletRequest header,
             @PathVariable Long detailId) {
 
-        return reviewService.findByReviewId(header, detailId);
+        return reviewService.findByReviewId(detailId);
     }
 
+    // memberId 기준 맞은 문제 조회
+    @GetMapping("/my-page/solved-problems")
+    public ResponseEntity<List<SolvedProblemDTO>> getSolvedProblems(HttpServletRequest request) {
+        return ResponseEntity.ok(reviewService.findSolvedProblems(request));
+    }
+
+    // memberId 기준 틀린 문제 조회
+    @GetMapping("/my-page/wrong-problems")
+    public ResponseEntity<List<SolvedProblemDTO>> getWrongProblems(HttpServletRequest request) {
+        return ResponseEntity.ok(reviewService.findWrongProblems(request));
+    }
+
+    //멤버+날짜 기준 풀었던 기록 가져오기
+    @GetMapping("/my-page/activity-history")
+    public ResponseEntity<List<ActivityHistoryDTO>> getActivityHistory(HttpServletRequest request) {
+        return ResponseEntity.ok(reviewService.getActivityHistory(request));
+    }
+
+    //총정리 api
+    @GetMapping("/my-page/statistics")
+    public ResponseEntity<MyPageStatisticsDTO> getStatistics(HttpServletRequest request) {
+        return ResponseEntity.ok(reviewService.getStatistics(request));
+    }
 
 }
