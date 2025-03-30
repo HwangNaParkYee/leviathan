@@ -30,6 +30,11 @@ public class ProblemController {
         return problemService.findProblem(problemId);
     }
 
+    @GetMapping("/findByProblemNumber/{problemNumber}")
+    public ResponseEntity<FindProblemDTO> findByProblemNumber(@PathVariable Long problemNumber){
+        return problemService.findByProblemNumber(problemNumber);
+    }
+
 
     @CrossOrigin(origins = "http://localhost:5173")  // React 앱 주소
     @GetMapping("/findByAllProblem")

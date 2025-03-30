@@ -32,14 +32,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     List<Review> findByMemberIdAndIsRight(Member member, Long isRight);
 
-    @Query("SELECT DISTINCT r.problemId.id FROM Review r " +
+    @Query("SELECT DISTINCT r.problemId.number FROM Review r " +
             "WHERE r.memberId = :member " +
             "AND r.problemId.id NOT IN (" +
             "   SELECT r2.problemId.id FROM Review r2 " +
             "   WHERE r2.memberId = :member AND r2.isRight = 1" +
             ") " +
             "AND r.isRight IS NULL")
-    List<Long> findWrongProblemIdsByMember(@Param("member") Member member);
+    List<Long> findWrongProblemNumbersByMember(@Param("member") Member member);
+
 
 
     @Query("SELECT FUNCTION('DATE', r.createDate), COUNT(r) " +

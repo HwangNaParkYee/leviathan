@@ -91,11 +91,7 @@ public class ReviewService {
 
 
 
-    public ResponseEntity<ReviewDTO> findByReviewId(HttpServletRequest header, Long reviewId) {
-
-        if ( !jwtUtility.validateToken(  jwtUtility.resolveToken(header) )){
-            return ResponseEntity.badRequest().body(new ReviewDTO());
-        }
+    public ResponseEntity<ReviewDTO> findByReviewId(Long reviewId) {
 
         Review review = reviewRepository.findById(reviewId).orElseThrow( ()-> new RuntimeException("doesnt have review"));
         return ResponseEntity.ok(ReviewDTO.fromEntity(review));
@@ -118,12 +114,13 @@ public class ReviewService {
     public List<SolvedProblemDTO> findWrongProblems(HttpServletRequest request) {
         Member member = memberService.tokenToMember(request);
 
-        List<Long> problemIds = reviewRepository.findWrongProblemIdsByMember(member);
+        List<Long> problemNumbers = reviewRepository.findWrongProblemNumbersByMember(member);
 
-        return problemIds.stream()
+        return problemNumbers.stream()
                 .map(SolvedProblemDTO::new)
                 .toList();
     }
+
 
     //잔디용
     public List<ActivityHistoryDTO> getActivityHistory(HttpServletRequest request) {
