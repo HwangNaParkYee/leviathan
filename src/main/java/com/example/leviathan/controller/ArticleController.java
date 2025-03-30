@@ -16,6 +16,7 @@ import java.util.List;
 public class ArticleController {
     private final ArticleService articleService;
 
+
     @GetMapping("/findByAll")
     public ResponseEntity<List<FindByAllArticleDTO>> findByAll() {
         return articleService.findByAllArticle();
