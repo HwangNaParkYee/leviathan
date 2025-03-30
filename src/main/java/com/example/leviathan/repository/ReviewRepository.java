@@ -29,4 +29,37 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // 특정 문제(problemId)의 맞춘 횟수 (isRight = 1)
     long countByProblemIdAndIsRight(Problem problemId, Long isRight);
+
+    List<Review> findByMemberIdAndIsRight(Member member, Long isRight);
+
+    @Query("SELECT DISTINCT r.problemId.id FROM Review r " +
+            "WHERE r.memberId = :member " +
+            "AND r.problemId.id NOT IN (" +
+            "   SELECT r2.problemId.id FROM Review r2 " +
+            "   WHERE r2.memberId = :member AND r2.isRight = 1" +
+            ") " +
+            "AND r.isRight IS NULL")
+    List<Long> findWrongProblemIdsByMember(@Param("member") Member member);
+
+
+    @Query("SELECT FUNCTION('DATE', r.createDate), COUNT(r) " +
+            "FROM Review r " +
+            "WHERE r.memberId = :member " +
+            "GROUP BY FUNCTION('DATE', r.createDate) " +
+            "ORDER BY FUNCTION('DATE', r.createDate) ASC")
+    List<Object[]> countSolvedProblemsPerDay(@Param("member") Member member);
+
+    @Query("SELECT COUNT(DISTINCT r.problemId.id) " +
+            "FROM Review r " +
+            "WHERE r.memberId = :member AND r.isRight = 1")
+    Long countDistinctSolvedProblems(@Param("member") Member member);
+
+    @Query("SELECT COUNT(DISTINCT r.problemId.id) " +
+            "FROM Review r " +
+            "WHERE r.memberId = :member")
+    Long countDistinctTriedProblems(@Param("member") Member member);
+
+    @Query("SELECT COUNT(r) FROM Review r WHERE r.memberId = :member")
+    Long countAllSubmissions(@Param("member") Member member);
+
 }
