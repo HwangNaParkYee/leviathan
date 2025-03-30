@@ -76,6 +76,16 @@ public class ProblemService {
         return ResponseEntity.ok(findProblemDTO);
     }
 
+    public ResponseEntity<FindProblemDTO> findByProblemNumber(Long problemNumber) {
+        Problem problem = problemRepository.findByNumber(problemNumber);
+
+        if (problem == null) {
+            return ResponseEntity.notFound().build();
+        }
+        FindProblemDTO findProblemDTO = new FindProblemDTO(problem, favoriteRepository.countByProblemId(problem), reviewService.createCorrectRate(problem.getId()));
+        return ResponseEntity.ok(findProblemDTO);
+    }
+
 
     public List<FindByAllProblemDTO> findByAllProblem() {
         // 모든 문제 조회

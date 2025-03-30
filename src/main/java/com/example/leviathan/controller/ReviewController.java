@@ -50,10 +50,9 @@ public class ReviewController {
     // reviewId 기준 리뷰 조회
     @GetMapping("/detail/{detailId}")
     public ResponseEntity<ReviewDTO> getReviewById(
-            HttpServletRequest header,
             @PathVariable Long detailId) {
 
-        return reviewService.findByReviewId(header, detailId);
+        return reviewService.findByReviewId(detailId);
     }
 
     // memberId 기준 맞은 문제 조회
