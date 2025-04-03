@@ -229,8 +229,10 @@ public class ProblemService {
             // Docker 이미지 이름을 동적으로 생성
             String imageName = "problem-" + problemId;
 
+
             // Docker 명령어를 실행할 환경 변수 설정
             String command = "docker run --rm -e USER_COMMANDS=\"" + answer + "\" " + imageName;
+            System.out.println("command = " + command + " -----------입니다.");
 
             // Docker 명령어 실행
             Process process = Runtime.getRuntime().exec(command);
