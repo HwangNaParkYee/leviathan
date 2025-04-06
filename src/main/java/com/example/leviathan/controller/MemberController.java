@@ -37,7 +37,6 @@ public class MemberController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginDTO dto){
 
