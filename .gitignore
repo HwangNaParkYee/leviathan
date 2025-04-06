@@ -37,5 +37,4 @@ out/
 .vscode/
 
 # .gitignore
-*.yml             # 모든 .yml 무시
-!/.github/workflows/*.yml
+/src/main/resources/application.yml
