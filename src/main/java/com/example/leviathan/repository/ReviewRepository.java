@@ -3,6 +3,7 @@ package com.example.leviathan.repository;
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.domain.Review;
+import com.example.leviathan.dto.SolvedProblemDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -41,6 +42,15 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND r.isRight IS NULL")
     List<Long> findWrongProblemNumbersByMember(@Param("member") Member member);
 
+    @Query("SELECT DISTINCT new com.example.leviathan.dto.SolvedProblemDTO(r.problemId.id, r.problemId.number) " +
+            "FROM Review r " +
+            "WHERE r.memberId = :member " +
+            "AND r.problemId.id NOT IN (" +
+            "   SELECT r2.problemId.id FROM Review r2 " +
+            "   WHERE r2.memberId = :member AND r2.isRight = 1" +
+            ") " +
+            "AND r.isRight IS NULL")
+    List<SolvedProblemDTO> findWrongProblemsDetailedByMember(@Param("member") Member member);
 
 
     @Query("SELECT FUNCTION('DATE', r.createDate), COUNT(r) " +

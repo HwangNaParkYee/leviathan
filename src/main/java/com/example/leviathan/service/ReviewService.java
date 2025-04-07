@@ -105,7 +105,10 @@ public class ReviewService {
         List<Review> solvedReviews = reviewRepository.findByMemberIdAndIsRight(member, 1L);
 
         return solvedReviews.stream()
-                .map(review -> new SolvedProblemDTO(review.getProblemId().getNumber()))
+                .map(review -> new SolvedProblemDTO(
+                        review.getProblemId().getId(),
+                        review.getProblemId().getNumber()
+                ))
                 .distinct()
                 .toList();
     }
@@ -114,12 +117,9 @@ public class ReviewService {
     public List<SolvedProblemDTO> findWrongProblems(HttpServletRequest request) {
         Member member = memberService.tokenToMember(request);
 
-        List<Long> problemNumbers = reviewRepository.findWrongProblemNumbersByMember(member);
-
-        return problemNumbers.stream()
-                .map(SolvedProblemDTO::new)
-                .toList();
+        return reviewRepository.findWrongProblemsDetailedByMember(member);
     }
+
 
 
     //잔디용
