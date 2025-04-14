@@ -36,6 +36,7 @@ public class ProblemService {
     private final JwtUtility jwtUtility;
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
+    private final MemberRepository memberRepository;
 
 
     @Transactional
@@ -260,7 +261,8 @@ public class ProblemService {
                 return "Error: Docker command failed with exit code " + exitCode + " - " + errorOutput.toString();
             }
 
-            Member member = memberService.tokenToMember(header);
+            String token = jwtUtility.extractAccessTokenFromCookie(header);
+            Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
             // 명령어 실행 결과 확인
             String result = output.toString();
@@ -289,9 +291,9 @@ public class ProblemService {
     @Transactional
     public String likeUpProblem(HttpServletRequest header, Long problemId) {
 
-
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
         // 토큰을 통해 Member 객체를 얻어오기
-        Member member = memberService.tokenToMember(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         // problemId를 통해 Problem 객체를 찾아오기 (문제에 따라 Problem 객체가 있어야 할 수도 있음)
         Problem problem = problemRepository.findById(problemId)

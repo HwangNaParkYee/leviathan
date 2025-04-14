@@ -63,14 +63,18 @@ public class ReviewService {
     }
 
     public List<ReviewDTO> findByProblemIdMemberIdReview(Long problemId, HttpServletRequest header) {
-        Member member = memberService.tokenToMember(header);
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        // 토큰을 통해 Member 객체를 얻어오기
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
         Problem problem = findByProblemId(problemId);
         List<Review> reviews = reviewRepository.findByProblemIdAndMemberId(problem, member);
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
 
     public List<ReviewDTO> findByMemberIdReview(HttpServletRequest header) {
-        Member member = memberService.tokenToMember(header);
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        // 토큰을 통해 Member 객체를 얻어오기
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
         List<Review> reviews = reviewRepository.findByMemberId(member);
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
@@ -100,7 +104,9 @@ public class ReviewService {
 
     //멤버 별로 맞은 문제 가져오기
     public List<SolvedProblemDTO> findSolvedProblems(HttpServletRequest request) {
-        Member member = memberService.tokenToMember(request);
+        String token = jwtUtility.extractAccessTokenFromCookie(request);
+        // 토큰을 통해 Member 객체를 얻어오기
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         List<Review> solvedReviews = reviewRepository.findByMemberIdAndIsRight(member, 1L);
 
@@ -115,7 +121,9 @@ public class ReviewService {
 
     //멤버 별로 틀린 문제 가져오기
     public List<SolvedProblemDTO> findWrongProblems(HttpServletRequest request) {
-        Member member = memberService.tokenToMember(request);
+        String token = jwtUtility.extractAccessTokenFromCookie(request);
+        // 토큰을 통해 Member 객체를 얻어오기
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         return reviewRepository.findWrongProblemsDetailedByMember(member);
     }
@@ -124,7 +132,9 @@ public class ReviewService {
 
     //잔디용
     public List<ActivityHistoryDTO> getActivityHistory(HttpServletRequest request) {
-        Member member = memberService.tokenToMember(request);
+        String token = jwtUtility.extractAccessTokenFromCookie(request);
+        // 토큰을 통해 Member 객체를 얻어오기
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         List<Object[]> results = reviewRepository.countSolvedProblemsPerDay(member);
 
@@ -137,7 +147,10 @@ public class ReviewService {
 
     //총 푼 문제 갯수, 도전한 문제 갯수, 제출 횟수
     public MyPageStatisticsDTO getStatistics(HttpServletRequest request) {
-        Member member = memberService.tokenToMember(request);
+        String token = jwtUtility.extractAccessTokenFromCookie(request);
+        // 토큰을 통해 Member 객체를 얻어오기
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
 
         Long totalSolved = reviewRepository.countDistinctSolvedProblems(member);
         Long totalTried = reviewRepository.countDistinctTriedProblems(member);

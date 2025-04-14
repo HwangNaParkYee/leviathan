@@ -33,8 +33,11 @@ public class ArticleService {
 
     @Transactional
     public ResponseEntity<SaveResDTO> saveArticle(HttpServletRequest header, SaveArticleDTO dto) {
+
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+
         // 토큰을 이용하여 member 조회
-        Member member = memberService.tokenToMember(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         Problem problem = problemRepository.findByNumber(dto.getProblemId());
 
@@ -50,14 +53,14 @@ public class ArticleService {
         return ResponseEntity.ok(resDTO);
     }
 
-
-
     @Transactional
     public void deleteArticle(HttpServletRequest header, Long articleId) {
-        Member member = memberService.tokenToMember(header);
+
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         Article article = articleRepository.findById(articleId)
-                        .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
         if(!article.getMemberId().getId().equals(member.getId())) {
             throw new IllegalStateException("본인이 작성한 게시물만 삭제할 수 있습니다.");
@@ -67,14 +70,14 @@ public class ArticleService {
     }
 
 
-
     @Transactional
     public ResponseEntity<String> updateArticle(HttpServletRequest header, ArticleUpdateDTO dto, Long articleId) {
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
 
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
         // 토큰으로 멤버 확인하기
-        Member member = memberService.tokenToMember(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         if(!article.getMemberId().getId().equals(member.getId())) {
             return ResponseEntity.status(403).body(null);       // 권한이 없을 경우 상태코드 403 반환

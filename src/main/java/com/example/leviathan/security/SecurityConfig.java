@@ -30,8 +30,7 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 // 간단한 테스트를 위해 csrf토큰 비활성화
-                .csrf((csrf) -> csrf.ignoringRequestMatchers("/**"))
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtility, customMemberDetailsService), UsernamePasswordAuthenticationFilter.class);
+                .csrf((csrf) -> csrf.ignoringRequestMatchers("/**"));
 
         return http.build();
     }
