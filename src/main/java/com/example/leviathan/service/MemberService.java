@@ -2,18 +2,23 @@ package com.example.leviathan.service;
 
 
 import com.example.leviathan.domain.Member;
+import com.example.leviathan.domain.RefreshToken;
 import com.example.leviathan.dto.LoginDTO;
 import com.example.leviathan.dto.SaveProblemDTO;
 import com.example.leviathan.dto.SignUpDTO;
 import com.example.leviathan.repository.MemberRepository;
+import com.example.leviathan.repository.RefreshTokenRepository;
 import com.example.leviathan.security.JwtUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -24,46 +29,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtUtility jwtUtility;
     private final PasswordService passwordService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public ResponseEntity<String> tokenToMemberId (HttpServletRequest request) {
-
-        System.out.println(jwtUtility.resolveToken(request) + " token값 입니다.!! ---------");
-
-        Member member = findByMemberId(jwtUtility.getMemberId(jwtUtility.resolveToken(request)));
-
-
-        if (member != null) {
-            return ResponseEntity.ok(member.getMemberId());
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("토큰이 유효하지 않거나 존재하지 않습니다.");
-        }
-    }
-
-
-
-    //토큰으로 멤버객체 가져옴
-    public Member tokenToMember(HttpServletRequest request) {
-        Member member = findByMemberId(jwtUtility.getMemberId(jwtUtility.resolveToken(request)));
-
-        if (member != null) {
-            return member;
-        } else {
-            throw new IllegalArgumentException("로그인을 해주세요.");
-        }
-    }
-
-    //멤버 아이디로 멤버 찾기
-    public Member findByMemberId(String memberId) {
-        try {
-            Member member = memberRepository.findByMemberId(memberId);
-            if (member == null) {
-                throw new IllegalArgumentException("아이디가 올바른지 확인해주세요.");
-            }
-            return member;
-        } catch (Exception e) {
-            throw new RuntimeException("회원 정보 조회 중 오류가 발생했습니다.");
-        }
-    }
 
     @Transactional
     public ResponseEntity<String> signUp(SignUpDTO dto) {
@@ -91,22 +58,45 @@ public class MemberService {
 
 
 
-    public ResponseEntity<String> login(LoginDTO dto) {
+    @Transactional
+    public ResponseEntity<Object> login(LoginDTO dto) {
         // 사용자 ID로 회원 정보를 찾음
         Member member = memberRepository.findByMemberId(dto.getMemberId());
 
         // 회원이 존재하고, 비밀번호가 일치하는지 확인
         if (member != null && passwordService.matches(dto.getPassword(), member.getPassword())) {
             // 비밀번호가 맞다면 JWT 토큰을 생성
-            String token = jwtUtility.generateToken(dto.getMemberId());
-            return ResponseEntity.ok(token);
+
+            String accessToken = jwtUtility.generateToken(dto.getMemberId(), member.getRole());
+            String refreshToken = jwtUtility.generateRefreshToken(dto.getMemberId());
+
+            refreshTokenRepository.deleteByMember(member);
+
+            RefreshToken newRefreshToken = new RefreshToken();
+            newRefreshToken.setMember(member);
+            newRefreshToken.setRefreshToken(refreshToken);
+            newRefreshToken.setExpiryDate(LocalDateTime.now().plusDays(30));
+            refreshTokenRepository.save(newRefreshToken);
+
+            ResponseCookie accessTokenCookie = ResponseCookie.from("accessToken", accessToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(60 * 60 * 24)
+                    .sameSite("Strict")
+                    .build();
+
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
+                    .body("로그인 성공");
+
         } else {
             // 비밀번호 불일치 또는 회원이 없는 경우
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("로그인 오류!! 아이디 또는 비밀번호가 잘못되었습니다.");
         }
     }
-
 
 
 
@@ -127,4 +117,12 @@ public class MemberService {
     }
 
 
+
+    @Transactional
+    public int logout(HttpServletRequest request) {
+        String token = jwtUtility.extractAccessTokenFromCookie(request);
+        String email = jwtUtility.getMemberIdFromToken(token);
+        Member member = memberRepository.findByMemberId(email);
+        return refreshTokenRepository.deleteByMember(member);
+    }
 }

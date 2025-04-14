@@ -6,6 +6,8 @@ import com.example.leviathan.dto.*;
 import com.example.leviathan.repository.ArticleRepository;
 import com.example.leviathan.repository.CommentLikesRepository;
 import com.example.leviathan.repository.CommentRepository;
+import com.example.leviathan.repository.MemberRepository;
+import com.example.leviathan.security.JwtUtility;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +25,16 @@ public class CommentService {
     private final ArticleRepository articleRepository;
     private final MemberService memberService;
     private final CommentLikesRepository commentLikesRepository;
+    private final JwtUtility jwtUtility;
+    private final MemberRepository memberRepository;
 
 
     //댓글 달기
     @Transactional
     public CommentDTO saveComment(SaveCommentDTO dto, HttpServletRequest header) {
-        Member member = memberService.tokenToMember(header);
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
         Article article = articleRepository.findById(dto.getArticleId())
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: ID=" + dto.getArticleId()));
 
@@ -41,7 +47,8 @@ public class CommentService {
     //댓글 업데이트
     @Transactional
     public CommentResponseDTO updateComment(Long commentId, UpdateCommentDTO dto, HttpServletRequest header) {
-        Member member = memberService.tokenToMember(header);
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다. ID: " + commentId));
@@ -58,7 +65,9 @@ public class CommentService {
 
     @Transactional
     public void deleteComment(Long commentId, HttpServletRequest header) {
-        Member member = memberService.tokenToMember(header); // JWT에서 현재 로그인한 사용자 정보 가져오기
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다. ID: " + commentId));

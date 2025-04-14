@@ -27,8 +27,10 @@ public class ArticleLikesService {
 
     @Transactional
     public ResponseEntity<String> toggleLike(HttpServletRequest header, Long articleId) {
+
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
         // 사용자 찾기
-        Member member = memberService.tokenToMember(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시물을 찾을 수 없습니다."));
@@ -56,7 +58,8 @@ public class ArticleLikesService {
     }
 
     public ResponseEntity<String> findByArticleIdMemberArticleLike(HttpServletRequest header, Long articleId) {
-        Member member = memberService.tokenToMember(header);
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         if (member == null){
             return ResponseEntity.ok("사용자 없음");
