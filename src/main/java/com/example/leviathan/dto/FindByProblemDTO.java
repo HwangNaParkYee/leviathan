@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class FindByProblemDTO {
     private Long id;
     private Long problemId;
+    private Long problemNumber;
     private String title;
     private String memberId;
     private LocalDate updateDate;
@@ -23,7 +24,8 @@ public class FindByProblemDTO {
 
     public FindByProblemDTO(Article article, Long likes, Long commentNumbers) {
         this.id = article.getId();
-        this.problemId = article.getProblemId().getNumber();
+        this.problemNumber = article.getProblemId().getNumber();
+        this.problemId = article.getProblemId().getId();
         this.title = article.getTitle();
         this.memberId = article.getMemberId().getMemberId();
         this.updateDate = article.getUpdateDate();

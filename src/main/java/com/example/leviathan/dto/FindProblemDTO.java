@@ -21,26 +21,24 @@ public class FindProblemDTO {
 
     public FindProblemDTO(Problem problem) {
         this.problemId = problem.getId();
-        this.problemNumber = Long.valueOf(problem.getNumber());
+        this.problemNumber = problem.getNumber();
         this.title = problem.getTitle();
         this.question = problem.getQuestion();
         this.hint = problem.getHint();
         // 즐겨찾기한 로직 아직 미구현 
         this.likes = 0L;
-        // 정답률 로직 아직 미구현
         this.correctRate = 0.0;
 
     }
 
     public FindProblemDTO(Problem problem,Long likes, Double correctRate) {
         this.problemId = problem.getId();
-        this.problemNumber = Long.valueOf(problem.getNumber());
+        this.problemNumber = problem.getNumber();
         this.title = problem.getTitle();
         this.question = problem.getQuestion();
         this.hint = problem.getHint();
         // 즐겨찾기한 로직 아직 미구현
         this.likes = likes;
-        // 정답률 로직 아직 미구현
         this.correctRate = correctRate;
 
     }

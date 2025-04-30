@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -231,8 +232,11 @@ public class ProblemService {
 
 
             // Docker 명령어를 실행할 환경 변수 설정
-            String command = "docker run --rm -e USER_COMMANDS=\"" + answer + "\" " + imageName;
-            System.out.println("command = " + command + " -----------입니다.");
+            String[] command = {
+                    "sh","-c","docker run --rm -e USER_COMMANDS='" + answer + "' " + imageName
+            };
+
+            System.out.println("command = " + Arrays.toString(command) + " -----------입니다.");
 
             // Docker 명령어 실행
             Process process = Runtime.getRuntime().exec(command);
@@ -276,6 +280,7 @@ public class ProblemService {
             } else {
                 reviewService.saveReview(saveReviewDTO);
                 saveReviewDTO.setIsRight(0L);
+                saveReviewDTO.setIsRight(0L);
                 return "Fail: " + result;  // 오답일 경우, 결과도 같이 반환
             }
 
@@ -313,6 +318,10 @@ public class ProblemService {
             favoriteRepository.save(newFavorite);
             return "Favorite added.";
         }
+    }
+
+    public List<Long> getAllProblemNumbers() {
+        return problemRepository.findAllProblemNumbers();
     }
 
 }

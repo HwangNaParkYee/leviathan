@@ -70,4 +70,10 @@ public class ProblemController {
         String result = problemService.likeUpProblem(header, problemId);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/all-numbers")
+    public ResponseEntity<List<Long>> getAllProblemNumbers() {
+        List<Long> numbers = problemService.getAllProblemNumbers();
+        return ResponseEntity.ok(numbers);
+    }
 }
