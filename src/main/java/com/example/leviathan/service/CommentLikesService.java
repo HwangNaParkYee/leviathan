@@ -5,6 +5,8 @@ import com.example.leviathan.domain.CommentLikes;
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.repository.CommentLikesRepository;
 import com.example.leviathan.repository.CommentRepository;
+import com.example.leviathan.repository.MemberRepository;
+import com.example.leviathan.security.JwtUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +18,14 @@ import org.springframework.stereotype.Service;
 public class CommentLikesService {
     private final CommentLikesRepository commentLikesRepository;
     private final CommentRepository commentRepository;
-    private final MemberService memberService;
+    private final JwtUtility jwtUtility;
+    private final MemberRepository memberRepository;
 
     //댓글 좋아요 토글 형식
     public boolean toggleCommentLike(Long commentId, HttpServletRequest header) {
-        Member member = memberService.tokenToMember(header); // JWT에서 사용자 정보 추출
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다. ID: " + commentId));
@@ -40,12 +45,8 @@ public class CommentLikesService {
     }
 
     public boolean toggleLikeCheck(Long commentId, HttpServletRequest header) {
-        Member member;
-        try {
-            member = memberService.tokenToMember(header); // JWT에서 사용자 정보 추출
-        } catch (Exception e) {
-            throw new RuntimeException("사용자 정보를 가져올 수 없습니다. (토큰 확인 필요)", e);
-        }
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
         if (member == null) {
             throw new RuntimeException("로그인한 사용자만 좋아요 가능.");
