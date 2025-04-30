@@ -10,6 +10,7 @@ public class FindByAllArticleDTO {
     private Long id;
     private String title;
     private String memberId;
+    private Long problemNumber;
     private Long problemId;
     private LocalDate updateDate;
     private Long likes;
@@ -19,7 +20,8 @@ public class FindByAllArticleDTO {
         this.id = article.getId();
         this.title = article.getTitle();
         this.memberId = article.getMemberId().getMemberId();
-        this.problemId = article.getProblemId().getNumber();
+        this.problemId = article.getProblemId().getId();
+        this.problemNumber = article.getProblemId().getNumber();
         this.updateDate = article.getUpdateDate();
         this.likes = likes;
         this.commentsNumber = commentsNumber;

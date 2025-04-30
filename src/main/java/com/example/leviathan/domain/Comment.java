@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -28,6 +30,9 @@ public class Comment {
     private String content;
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<CommentLikes> commentLikesList = new ArrayList<>();
 
     public Comment(Article article, Member member, String content, LocalDateTime createDate, LocalDateTime updateDate) {
         this.articleId = article;

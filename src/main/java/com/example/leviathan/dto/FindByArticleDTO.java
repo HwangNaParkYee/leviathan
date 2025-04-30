@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class FindByArticleDTO {
     private Long articleId;
     private Long problemNumber;
+    private Long problemId;
     private String title;
     private String content;
     private String code;
@@ -24,6 +25,7 @@ public class FindByArticleDTO {
     public FindByArticleDTO(Article article, Long likes) {
         this.articleId = article.getId();
         this.problemNumber = article.getProblemId().getNumber();
+        this.problemId = article.getProblemId().getId();
         this.title = article.getTitle();
         this.content = article.getContent();
         this.code = article.getCode();
