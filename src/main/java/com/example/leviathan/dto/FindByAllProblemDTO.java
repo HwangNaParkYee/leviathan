@@ -17,3 +17,4 @@ public class FindByAllProblemDTO {
     private Double correct;
 
 }
+    
