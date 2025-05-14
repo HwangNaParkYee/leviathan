@@ -23,8 +23,6 @@ public class ProblemController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:5173")  // React 앱 주소
-
     @GetMapping("/findProblem/{problemId}")
     public ResponseEntity<FindProblemDTO> findProblem(@PathVariable Long problemId){
         return problemService.findProblem(problemId);
@@ -36,8 +34,7 @@ public class ProblemController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:5173")  // React 앱 주소
-    @GetMapping("/findByAllProblem")
+    @GetMapping("/public/findByAllProblem")
     public ResponseEntity<List<FindByAllProblemDTO>> findByAllProblem(){
         List<FindByAllProblemDTO> problems = problemService.findByAllProblem();
         return ResponseEntity.ok(problems);
