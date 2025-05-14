@@ -13,6 +13,7 @@ public class FindByAllProblemDTO {
     private Long problemNumber;
     private String title;
     private Long likes;
+    private int lv;
     private Double correct;
 
 }

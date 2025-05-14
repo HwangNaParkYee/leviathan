@@ -16,6 +16,7 @@ public class FindProblemDTO {
     private String question;
     private String hint;
     private Long likes;
+    private int lv;
     private Double correctRate;
 
 
@@ -39,6 +40,7 @@ public class FindProblemDTO {
         this.hint = problem.getHint();
         // 즐겨찾기한 로직 아직 미구현
         this.likes = likes;
+        this.lv = problem.getLv();
         this.correctRate = correctRate;
 
     }
