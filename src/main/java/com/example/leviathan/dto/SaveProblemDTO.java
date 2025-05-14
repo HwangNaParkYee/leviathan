@@ -14,5 +14,6 @@ public class SaveProblemDTO {
     private String title;
     private String question;
     private String hint;
+    private int lv;
 
 }

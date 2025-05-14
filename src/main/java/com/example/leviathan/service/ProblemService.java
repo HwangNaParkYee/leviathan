@@ -51,7 +51,7 @@ public class ProblemService {
         }
 
         // 3. 새로운 Problem 객체 생성
-        Problem problem = new Problem(dto.getNumber(), dto.getTitle(), dto.getQuestion(), dto.getHint());
+        Problem problem = new Problem(dto.getNumber(), dto.getTitle(), dto.getQuestion(), dto.getHint(), dto.getLv());
 
         // 4. 새로운 문제 저장
         problemRepository.save(problem);
@@ -103,6 +103,7 @@ public class ProblemService {
                             problem.getNumber(),
                             problem.getTitle(),
                             likes,  // 좋아요 개수
+                            problem.getLv(),
                             reviewService.createCorrectRate(problem.getId())
                     );
                 })
@@ -136,6 +137,9 @@ public class ProblemService {
         }
         if (dto.getHint() != null) {
             problem.setHint(dto.getHint());
+        }
+        if (dto.getLv() != problem.getLv()) {
+            problem.setLv(dto.getLv());
         }
 
         // 업데이트된 문제를 저장하고 반환

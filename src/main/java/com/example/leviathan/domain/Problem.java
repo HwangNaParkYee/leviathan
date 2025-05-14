@@ -22,12 +22,14 @@ public class Problem {
     private String title;
     private String question;
     private String hint;
+    private int lv;
 
-    public Problem(Long number, String title, String question, String hint) {
+    public Problem(Long number, String title, String question, String hint, int lv) {
         this.number = number;
         this.title = title;
         this.question = question;
         this.hint = hint;
+        this.lv = lv;
     }
 
 

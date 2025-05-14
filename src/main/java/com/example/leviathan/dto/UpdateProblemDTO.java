@@ -15,5 +15,6 @@ public class UpdateProblemDTO {
     private String title;
     private String question;
     private String hint;
+    private int lv;
 
 }
