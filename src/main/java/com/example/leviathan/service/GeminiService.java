@@ -111,8 +111,20 @@ public class GeminiService {
         String dockerfile = extractCodeBlock(text, "\\[Dockerfile\\]", "Dockerfile");
         String shellScript = extractCodeBlock(text, "\\[run\\.sh\\]", "bash");
 
+        // 기본 Dockerfile 템플릿 삽입
+        if (dockerfile.isBlank()) {
+            dockerfile = """
+                FROM ubuntu:latest
+                WORKDIR /home
+                RUN apt-get update && apt-get install -y bash
+                COPY run.sh /run.sh
+                RUN chmod +x /run.sh
+                CMD ["/run.sh"]
+                """.trim();
+        }
         return new GptResult(title, question, hint, level, dockerfile, shellScript);
     }
+
 
     private String extractBlock(String text, String regex, int group) {
         Pattern pattern = Pattern.compile(regex, Pattern.DOTALL);
