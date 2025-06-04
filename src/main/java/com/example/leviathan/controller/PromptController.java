@@ -2,6 +2,7 @@ package com.example.leviathan.controller;
 
 
 import com.example.leviathan.dto.FindProblemDTO;
+import com.example.leviathan.dto.GptResult;
 import com.example.leviathan.dto.UserPromptDTO;
 import com.example.leviathan.service.ProblemService;
 import com.example.leviathan.service.PromptService;
@@ -31,9 +32,8 @@ public class PromptController {
     }
 
     @PostMapping("/prompt")
-    public ResponseEntity<String> generate(@RequestBody Map<String, String> body) {
-        String topic = body.get("topic");
-        String result = geminiService.generateProblem(topic);
+    public ResponseEntity<GptResult> generate(@RequestBody UserPromptDTO dto) {
+        GptResult result = geminiService.generateProblem(dto);
         return ResponseEntity.ok(result);
     }
 }
