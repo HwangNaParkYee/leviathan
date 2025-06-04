@@ -16,19 +16,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
-@RequiredArgsConstructor
 public class GeminiService {
     private final RestTemplate restTemplate;
-    private final String baseUrl;
-    private final String apiKey;
 
-    public GeminiService(RestTemplateBuilder builder,
-                         @Value("${gemini.baseurl}") String baseUrl,
-                         @Value("${gemini.api-key}") String apiKey) {
+    @Value("${gemini.baseurl}")
+    private String baseUrl;
+
+    @Value("${gemini.api-key}")
+    private String apiKey;
+
+    // 생성자 직접 정의
+    public GeminiService(RestTemplateBuilder builder) {
         this.restTemplate = builder.build();
-        this.baseUrl = baseUrl;
-        this.apiKey = apiKey;
     }
+
+
 
     public GptResult generateProblem(UserPromptDTO dto) {
         String prompt = buildPrompt(dto.getPrompt());
