@@ -4,7 +4,6 @@ import com.example.leviathan.dto.GeminiRequest;
 import com.example.leviathan.dto.GeminiResponse;
 import com.example.leviathan.dto.GptResult;
 import com.example.leviathan.dto.UserPromptDTO;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
@@ -33,7 +32,7 @@ public class GeminiService {
 
 
     public GptResult generateProblem(UserPromptDTO dto) {
-        String prompt = buildPrompt(dto.getPrompt());
+        String prompt = buildPrompt(dto.getPrompt(), dto.getLevel());
 
         GeminiRequest request = new GeminiRequest(
                 List.of(new GeminiRequest.Content(
@@ -63,7 +62,7 @@ public class GeminiService {
         return parseResponse(content);
     }
 
-    private String buildPrompt(String topic) {
+    private String buildPrompt(String topic, int level) {
         return """
                 당신은 리눅스 온라인 저지 시스템 문제를 만드는 AI입니다.
 
@@ -81,7 +80,7 @@ public class GeminiService {
                 문제 풀이를 도와줄 힌트를 적으세요.
 
                 [Level]
-                난이도 숫자만 (예: 1, 2, 3)
+                반드시 숫자 %d로 입력하세요.
 
                 [Dockerfile]
                 ```Dockerfile
@@ -94,11 +93,28 @@ public class GeminiService {
                 ```
 
                 [run.sh]
+                다음 조건에 따라 채점 스크립트를 작성하세요:
+
+                - `#!/bin/bash`로 시작하는 bash 스크립트 형식이어야 합니다.
+                - 사용자가 입력한 명령어는 `$USER_COMMANDS`에 문자열 형태로 주어지며, `eval $USER_COMMANDS`로 실행합니다.
+                - 단순히 명령어 문자열을 비교하지 말고, **명령어 실행 결과로 생성된 파일이나 출력 결과를 기준으로** 정답 여부를 판단하세요.
+                - 예: "hi.txt 파일을 만들어라"는 문제일 경우, 해당 파일이 `/home/hi.txt`에 실제로 생성되었는지 `-f` 체크를 통해 확인하세요.
+                - 사용자의 답이 정답일 경우 `"맞았습니다!"`를 출력하고 `exit 0`, 틀렸을 경우 `"틀렸습니다."`를 출력하고 `exit 1`을 수행하세요.
+                
+                예시:
                 ```bash
                 #!/bin/bash
-                # 여기에 채점용 스크립트 로직이 들어갑니다
-                ```
-                """.formatted(topic);
+                eval $USER_COMMANDS
+                                
+                # 파일 생성 여부 확인
+                if [ -f "/home/hi.txt" ]; then
+                    echo "맞았습니다!"
+                    exit 0
+                else
+                    echo "틀렸습니다."
+                    exit 1
+                fi
+                """.formatted(topic, level);
     }
 
     private GptResult parseResponse(String text) {
