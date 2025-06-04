@@ -65,7 +65,7 @@ public class PromptService {
         // Docker 이미지 빌드
         try {
             ProcessBuilder builder = new ProcessBuilder(
-                    "docker", "build", "-t", "problem-" + problem.getId() + "-image", "."
+                    "docker", "build", "-t", "problem-" + problem.getId()
             );
             builder.directory(problemDir); // 실행 디렉토리 설정
             builder.inheritIO(); // 로그 출력
