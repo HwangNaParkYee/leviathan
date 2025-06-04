@@ -28,21 +28,60 @@ public class PromptService {
     public Long savePromptProblem(UserPromptDTO dto) {
         GptResult gptResult = geminiService.generateProblem(dto);
 
-        String basePath = System.getProperty("user.dir") + "/docker_problems_file";
-        File file = new File(basePath);
-
-
-        String dockerFileContent = gptResult.getDockerfile();
-        String shellFileContent = gptResult.getShellScript();
-
         Problem problem = new Problem(gptResult);
         problem.setNumber(problem.getId());
-
         problemRepository.save(problem);
+
+
+        // 디렉터리 경로 설정
+        String basePath = System.getProperty("user.dir") + "/docker_problems_file";
+        String problemDirPath = basePath + "/problem-" + problem.getId();
+
+        File problemDir = new File(problemDirPath);
+        if (!problemDir.exists()) {
+            boolean created = problemDir.mkdirs();
+            if (!created) {
+                throw new RuntimeException("문제 디렉토리 생성 실패: " + problemDirPath);
+            }
+        }
+
+        // 파일 작성
+        try {
+            // Dockerfile
+            File dockerFile = new File(problemDir, "Dockerfile");
+            java.nio.file.Files.writeString(dockerFile.toPath(), gptResult.getDockerfile());
+
+            // run.sh
+            File runScript = new File(problemDir, "run.sh");
+            java.nio.file.Files.writeString(runScript.toPath(), gptResult.getShellScript());
+
+            // 실행 권한 부여
+            runScript.setExecutable(true);
+
+        } catch (Exception e) {
+            throw new RuntimeException("파일 생성 중 오류 발생", e);
+        }
+
+        // Docker 이미지 빌드
+        try {
+            ProcessBuilder builder = new ProcessBuilder(
+                    "docker", "build", "-t", "problem-" + problem.getId() + "-image", "."
+            );
+            builder.directory(problemDir); // 실행 디렉토리 설정
+            builder.inheritIO(); // 로그 출력
+
+            Process process = builder.start();
+            int exitCode = process.waitFor();
+
+            if (exitCode != 0) {
+                throw new RuntimeException("Docker 이미지 빌드 실패. 종료 코드: " + exitCode);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Docker 빌드 중 오류 발생", e);
+        }
+
         return problem.getId();
-
     }
-
 
 
 
