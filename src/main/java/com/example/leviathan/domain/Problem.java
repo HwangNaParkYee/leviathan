@@ -21,6 +21,7 @@ public class Problem {
     @Column(unique = true)  // 유니크 제약 조건 추가
     private Long number;
     private String title;
+    @Column(name = "question", columnDefinition = "TEXT")
     private String question;
     private String hint;
     private int lv;

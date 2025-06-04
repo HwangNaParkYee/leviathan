@@ -29,9 +29,10 @@ public class PromptService {
         GptResult gptResult = geminiService.generateProblem(dto);
 
         Problem problem = new Problem(gptResult);
-        problem.setNumber(problem.getId());
         problemRepository.save(problem);
 
+        problem.setNumber(problem.getId()); // id를 number에 복사
+        problemRepository.save(problem); // 다시 저장
 
         // 디렉터리 경로 설정
         String basePath = System.getProperty("user.dir") + "/docker_problems_file";
@@ -65,8 +66,9 @@ public class PromptService {
         // Docker 이미지 빌드
         try {
             ProcessBuilder builder = new ProcessBuilder(
-                    "docker", "build", "-t", "problem-" + problem.getId()
+                    "docker", "build", "-t", "problem-" + problem.getId(), "."
             );
+
             builder.directory(problemDir); // 실행 디렉토리 설정
             builder.inheritIO(); // 로그 출력
 
