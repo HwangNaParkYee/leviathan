@@ -5,14 +5,10 @@ import com.example.leviathan.domain.Favorite;
 import com.example.leviathan.domain.Member;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.dto.*;
-import com.example.leviathan.repository.FavoriteRepository;
-import com.example.leviathan.repository.MemberRepository;
-import com.example.leviathan.repository.ProblemRepository;
-import com.example.leviathan.repository.ReviewRepository;
+import com.example.leviathan.repository.*;
 import com.example.leviathan.security.JwtUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +33,7 @@ public class ProblemService {
     private final ReviewService reviewService;
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
+    private final MyProblemRepository myProblemRepository;
 
 
     @Transactional
@@ -414,4 +410,23 @@ public class ProblemService {
                 })
                 .collect(Collectors.toList());
     }
+
+
+    // 사용자가 생성한 문제들 조회
+    public List<MyProblemDTO> getAllMyProblemNumbers(HttpServletRequest header) {
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
+        if (member == null) {
+            throw new RuntimeException("로그인을 해주세요.");
+        }
+
+        return myProblemRepository.findAllByMemberId(member).stream()
+                .map(MyProblem -> {
+                    Problem problem = MyProblem.getProblemId();
+                    return new MyProblemDTO(problem);
+                })
+                .collect(Collectors.toList());
+    }
+
 }

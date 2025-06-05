@@ -7,6 +7,7 @@ import com.example.leviathan.dto.UserPromptDTO;
 import com.example.leviathan.service.ProblemService;
 import com.example.leviathan.service.PromptService;
 import com.example.leviathan.service.GeminiService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +27,7 @@ public class PromptController {
     private final GeminiService geminiService;
 
     @PostMapping("/savePromptProblem")
-    public ResponseEntity<?> savePromptProblem(@RequestBody UserPromptDTO dto) {
+    public ResponseEntity<?> savePromptProblem(@RequestBody UserPromptDTO dto, HttpServletRequest header) {
         boolean isValid = geminiService.checkPrompt(dto.getPrompt());
 
         if(!isValid) {
@@ -34,7 +35,7 @@ public class PromptController {
                     .badRequest()
                     .body(Map.of("error", "요청하신 내용은 리눅스 실습 문제로 부적절합니다."));
         }
-        Long problemNumber =  promptService.savePromptProblem(dto);
+        Long problemNumber =  promptService.savePromptProblem(dto, header);
         return problemService.findProblem(problemNumber);
     }
 
