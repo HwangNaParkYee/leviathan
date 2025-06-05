@@ -166,6 +166,7 @@ public class ProblemService {
 
         // 4. docker run --rm 명령어 생성
         String fullCommand = String.format(
+
                 "docker run --rm --name %s %s bash -c \"%s\"",
                 containerName,
                 imageName,
@@ -221,7 +222,7 @@ public class ProblemService {
             String command;
             if (isWindows) {
                 // CMD에서는 아래처럼 "docker run 이미지 /bin/sh -c "명령어"" 형태로 실행
-                command = String.format("docker run --rm %s /bin/sh -c \"%s\"", imageName, userCommand);
+                command = String.format("docker run --rm -e USER_COMMANDS=\"%s\" %s", userCommand, imageName);
             } else {
                 // Linux/macOS도 동일하게 쉘 명령어 직접 전달
                 command = String.format("docker run --rm %s /bin/sh -c \"%s\"", imageName, userCommand);
@@ -258,7 +259,7 @@ public class ProblemService {
             reviewDTO.setMemberId(member.getId());
             reviewDTO.setAnswer(dto.getAnswer());
 
-            if (exitCode == 0) {
+            if (exitCode == 3) {
                 reviewDTO.setIsRight(1L);
                 reviewService.saveReview(reviewDTO);
                 return "맞았습니다!!";

@@ -120,59 +120,72 @@ public class GeminiService {
 
     private String buildPrompt(String topic, int level) {
         return """
-                당신은 리눅스 온라인 저지 시스템 문제를 만드는 AI입니다.
-                
-                사용자 요청 주제: "%s"
-                
-                아래 형식에 따라 문제를 만들어주세요. \s
-                - Question은 너무 길지 않게, 500자 이하로 작성하세요. (DB의 Text 타입 제한 때문입니다) \s
-                - 문제 난이도(Level)는 사용자 전달해준 1~5 사이 숫자로 어려움 정도를 표현하세요. 
-                
-                [Title]
-                문제 제목
-                
-                [Question]
-                문제 설명을 서술형으로 간단하게 작성하세요.
-                
-                [Hint]
-                문제 풀이에 도움이 되는 힌트를 적으세요.
-                
-                [Level]
-                숫자 %d (1~5)
-                
-                [Dockerfile]
-                ```Dockerfile
-                FROM ubuntu:latest
-                WORKDIR /home
-                RUN apt-get update && apt-get install -y bash
-                COPY run.sh /run.sh
-                RUN chmod +x /run.sh
-                CMD ["/run.sh"]
-                ```
+            당신은 리눅스 온라인 저지 시스템 문제를 만드는 AI입니다.\s
+            
+            사용자 요청 주제: "%s"
+            
+            아래 형식에 따라 문제를 만들어주세요.
+                 - Question은 245자 이하로 간결하게 작성하세요. (DB 텍스트 제한 때문)
+                 - 문제 난이도(Level)는 사용자 전달한 1~5 사이 숫자로 표현하세요.
+                 - 문제에 등장하는 모든 초기 파일이나 디렉토리는 반드시 Dockerfile 내에서 생성하거나 복사하세요.
+                 - 문제 설명에 “특정 명령어 사용 금지”와 같은 제한사항은 포함하지 마세요. (불필요한 혼란 방지)
+                 - 사용자가 문제를 해결하기 위해 입력할 명령어는 `cd`, `mkdir`, `touch`, `ls`, `pwd` 등 일반적인 리눅스 명령어 범위 내여야 하며, 특별한 제한은 두지 마세요.
+                 - run.sh는 아래 조건을 반드시 만족해야 합니다:
+                   - `#!/bin/bash`로 시작하는 bash 스크립트 형식
+                   - 사용자 명령어는 `$USER_COMMANDS` 변수에 문자열로 주어지고, `eval $USER_COMMANDS`로 실행함
+                   - 명령어 실행 후 생성된 파일, 디렉토리, 출력 결과 등으로 정답 여부를 판단
+                   - 정답일 경우 `"맞았습니다!"` 출력 후 `exit 3`
+                   - 오답일 경우 `"틀렸습니다."` 출력 후 `exit 1`
+                 - Dockerfile은 Ubuntu 최신 이미지 기반이며, 필요한 패키지 설치 및 작업 디렉토리 설정, 초기 파일 및 디렉토리 생성, run.sh 복사 및 실행 권한 설정, 실행 명령어 설정까지 포함하세요.
+                 - 만약 해당 문제에서 초기 파일이 있다고 한다면 그 초기 파일을 만들어줘야 합니다!!!
+                 - 초기 위치 아래에 dir1 폴더가 있다면 Dockerfile 내부에 RUN mkdir /home/dir1 같은 명령어를 입력해주어야 합니다.
+                 
+                        
+            
+                    
+                 [Title]
+                 문제 제목
 
-                [run.sh]
-                다음 조건에 따라 채점 스크립트를 작성하세요:
+                 [Question]
+                 간단 명료한 문제 설명
+ 
+                 [Hint]
+                 문제 풀이에 도움이 될 힌트
+ 
+                 [Level]
+                 난이도 숫자 %d (1~5)
+ 
+                 [Dockerfile]
+                 ```Dockerfile
+                 FROM ubuntu:latest
+                 WORKDIR /home
+                 RUN apt-get update && apt-get install -y bash
+ 
+                 # 문제에 필요한 초기 디렉토리 및 파일 생성
+                 # 예) RUN mkdir -p /home/dir1 && touch /home/dir1/file1.txt
+ 
+                 COPY run.sh /run.sh
+                 RUN chmod +x /run.sh
+                 CMD ["/run.sh"]
+                 ```
 
-                - `#!/bin/bash`로 시작하는 bash 스크립트 형식이어야 합니다.
-                - 사용자가 입력한 명령어는 `$USER_COMMANDS`에 문자열 형태로 주어지며, `eval $USER_COMMANDS`로 실행합니다.
-                - 단순히 명령어 문자열을 비교하지 말고, **명령어 실행 결과로 생성된 파일이나 출력 결과를 기준으로** 정답 여부를 판단하세요.
-                - 예: "hi.txt 파일을 만들어라"는 문제일 경우, 해당 파일이 `/home/hi.txt`에 실제로 생성되었는지 `-f` 체크를 통해 확인하세요.
-                - 사용자의 답이 정답일 경우 `"맞았습니다!"`를 출력하고 `exit 0`, 틀렸을 경우 `"틀렸습니다."`를 출력하고 `exit 1`을 수행하세요.
-                
-                예시:
-                ```bash
-                #!/bin/bash
-                eval $USER_COMMANDS
-                                
-                # 파일 생성 여부 확인
-                if [ -f "/home/hi.txt" ]; then
-                    echo "맞았습니다!"
-                    exit 0
-                else
-                    echo "틀렸습니다."
-                    exit 1
-                fi
-                """.formatted(topic, level);
+                 [run.sh]
+                 ```
+                 #!/bin/bash
+                 eval $USER_COMMANDS
+                 
+                 # 문제 조건에 따라 정답 여부 판단 로직 작성
+                 # 예) 특정 파일이나 디렉토리 존재 여부 또는 출력 결과 확인
+                 
+                 if [ ... ]; then
+                     echo "맞았습니다!"
+                     exit 3
+                 else
+                     echo "틀렸습니다."
+                     exit 1
+                 fi
+                 ```
+        """.formatted(topic, level);
     }
 
     private GptResult parseResponse(String text) {
