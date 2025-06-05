@@ -65,23 +65,25 @@ public class GeminiService {
     private String buildPrompt(String topic, int level) {
         return """
                 당신은 리눅스 온라인 저지 시스템 문제를 만드는 AI입니다.
-
+                
                 사용자 요청 주제: "%s"
-
-                아래 형식에 따라 문제를 만들어주세요. 각 항목은 아래 형식대로 정확하게 작성되어야 합니다:
-
+                
+                아래 형식에 따라 문제를 만들어주세요. \s
+                - Question은 너무 길지 않게, 500자 이하로 작성하세요. (DB의 Text 타입 제한 때문입니다) \s
+                - 문제 난이도(Level)는 사용자 전달해준 1~5 사이 숫자로 어려움 정도를 표현하세요. 
+                
                 [Title]
                 문제 제목
-
+                
                 [Question]
-                문제 설명을 서술형으로 작성하세요.
-
+                문제 설명을 서술형으로 간단하게 작성하세요.
+                
                 [Hint]
-                문제 풀이를 도와줄 힌트를 적으세요.
-
+                문제 풀이에 도움이 되는 힌트를 적으세요.
+                
                 [Level]
-                반드시 숫자 %d로 입력하세요.
-
+                숫자 %d (1~5)
+                
                 [Dockerfile]
                 ```Dockerfile
                 FROM ubuntu:latest

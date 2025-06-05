@@ -201,34 +201,37 @@ public class ProblemService {
         }
     }
 
-
-    // 문제 제출 메소드
+    // 윈도우 로컬에서 실행 할 경우 이 메소드를 사용하세요.
     @Transactional
     public String submitProblem(HttpServletRequest header, SubmitProblemDTO dto) {
         String problemId = dto.getProblemId().toString();
         String imageName = "problem-" + problemId;
 
-        // 1. 문제 존재 여부 확인
         Optional<Problem> problem = problemRepository.findById(dto.getProblemId());
         if (problem.isEmpty()) {
             return "Error: Problem with ID " + dto.getProblemId() + " does not exist.";
         }
 
         try {
-            // 2. 사용자 명령어 이스케이프 처리
             String userCommand = dto.getAnswer().replace("\"", "\\\"");
 
-            // 3. docker run 명령어 - 환경변수 USER_COMMANDS 포함
-            String command = String.format(
-                    "docker run --rm -e USER_COMMANDS=\"%s\" %s /run.sh",
-                    userCommand,
-                    imageName
-            );
+            String os = System.getProperty("os.name").toLowerCase();
+            boolean isWindows = os.contains("win");
 
-            // 4. docker 명령 실행
-            Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", command});
+            String command;
+            if (isWindows) {
+                // CMD에서는 아래처럼 "docker run 이미지 /bin/sh -c "명령어"" 형태로 실행
+                command = String.format("docker run --rm %s /bin/sh -c \"%s\"", imageName, userCommand);
+            } else {
+                // Linux/macOS도 동일하게 쉘 명령어 직접 전달
+                command = String.format("docker run --rm %s /bin/sh -c \"%s\"", imageName, userCommand);
+            }
 
-            // 5. stdout, stderr 읽기
+            // Process 실행 부분
+            Process process = isWindows ?
+                    Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c", command}) :
+                    Runtime.getRuntime().exec(new String[]{"sh", "-c", command});
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             StringBuilder output = new StringBuilder();
@@ -241,17 +244,21 @@ public class ProblemService {
             int exitCode = process.waitFor();
             String result = output.toString();
 
-            // 6. 사용자 정보 조회
+            // **디버그용 로그 출력 (stdout, stderr, exit code)**
+            System.out.println("Docker stdout:\n" + result);
+            System.out.println("Docker stderr:\n" + errorOutput.toString());
+            System.out.println("Docker process exit code: " + exitCode);
+
+            // 사용자 정보 조회
             String token = jwtUtility.extractAccessTokenFromCookie(header);
             Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
 
-            // 7. 리뷰 저장
             SaveReviewDTO reviewDTO = new SaveReviewDTO();
             reviewDTO.setProblemId(dto.getProblemId());
             reviewDTO.setMemberId(member.getId());
             reviewDTO.setAnswer(dto.getAnswer());
 
-            if (result.contains("정답입니다!")) {
+            if (exitCode == 0) {
                 reviewDTO.setIsRight(1L);
                 reviewService.saveReview(reviewDTO);
                 return "맞았습니다!!";
@@ -266,6 +273,72 @@ public class ProblemService {
             return "Error during execution: " + e.getMessage();
         }
     }
+
+
+    // 문제 제출 메소드
+//    @Transactional
+//    public String submitProblem(HttpServletRequest header, SubmitProblemDTO dto) {
+//        String problemId = dto.getProblemId().toString();
+//        String imageName = "problem-" + problemId;
+//
+//        // 1. 문제 존재 여부 확인
+//        Optional<Problem> problem = problemRepository.findById(dto.getProblemId());
+//        if (problem.isEmpty()) {
+//            return "Error: Problem with ID " + dto.getProblemId() + " does not exist.";
+//        }
+//
+//        try {
+//            // 2. 사용자 명령어 이스케이프 처리
+//            String userCommand = dto.getAnswer().replace("\"", "\\\"");
+//
+//            // 3. docker run 명령어 - 환경변수 USER_COMMANDS 포함
+//            String command = String.format(
+//                    "docker run --rm -e USER_COMMANDS=\"%s\" %s /run.sh",
+//                    userCommand,
+//                    imageName
+//            );
+//
+//            // 4. docker 명령 실행
+//            Process process = Runtime.getRuntime().exec(new String[]{"sh", "-c", command});
+//
+//            // 5. stdout, stderr 읽기
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+//            StringBuilder output = new StringBuilder();
+//            StringBuilder errorOutput = new StringBuilder();
+//            String line;
+//
+//            while ((line = reader.readLine()) != null) output.append(line).append("\n");
+//            while ((line = errorReader.readLine()) != null) errorOutput.append(line).append("\n");
+//
+//            int exitCode = process.waitFor();
+//            String result = output.toString();
+//
+//            // 6. 사용자 정보 조회
+//            String token = jwtUtility.extractAccessTokenFromCookie(header);
+//            Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+//
+//            // 7. 리뷰 저장
+//            SaveReviewDTO reviewDTO = new SaveReviewDTO();
+//            reviewDTO.setProblemId(dto.getProblemId());
+//            reviewDTO.setMemberId(member.getId());
+//            reviewDTO.setAnswer(dto.getAnswer());
+//
+//            if (result.contains("정답입니다!")) {
+//                reviewDTO.setIsRight(1L);
+//                reviewService.saveReview(reviewDTO);
+//                return "맞았습니다!!";
+//            } else {
+//                reviewDTO.setIsRight(0L);
+//                reviewService.saveReview(reviewDTO);
+//                return "틀렸습니다";
+//            }
+//
+//        } catch (IOException | InterruptedException e) {
+//            e.printStackTrace();
+//            return "Error during execution: " + e.getMessage();
+//        }
+//    }
 
     @Transactional
     public String likeUpProblem(HttpServletRequest header, Long problemId) {
