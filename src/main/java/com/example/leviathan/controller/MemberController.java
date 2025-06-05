@@ -24,8 +24,6 @@ public class MemberController {
     private final MemberService memberService;
 
 
-
-
     @PostMapping("/signUp")
     public ResponseEntity<String> signUp(@RequestBody SignUpDTO dto){
         return memberService.signUp(dto);

@@ -1,10 +1,16 @@
 package com.example.leviathan.service;
 
 
+import com.example.leviathan.domain.Member;
+import com.example.leviathan.domain.MyProblem;
 import com.example.leviathan.domain.Problem;
 import com.example.leviathan.dto.GptResult;
 import com.example.leviathan.dto.UserPromptDTO;
+import com.example.leviathan.repository.MemberRepository;
+import com.example.leviathan.repository.MyProblemRepository;
 import com.example.leviathan.repository.ProblemRepository;
+import com.example.leviathan.security.JwtUtility;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.http.*;
@@ -23,16 +29,30 @@ public class PromptService {
 
     private final ProblemRepository problemRepository;
     private final GeminiService geminiService;
+    private final JwtUtility jwtUtility;
+    private final MemberRepository memberRepository;
+    private final MyProblemRepository myProblemRepository;
 
     @Transactional
-    public Long savePromptProblem(UserPromptDTO dto) {
+    public Long savePromptProblem(UserPromptDTO dto, HttpServletRequest header) {
         GptResult gptResult = geminiService.generateProblem(dto);
+
+        // 사용자 정보 조회
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
+
 
         Problem problem = new Problem(gptResult);
         problemRepository.save(problem);
 
         problem.setNumber(problem.getId()); // id를 number에 복사
         problemRepository.save(problem); // 다시 저장
+
+        MyProblem myProblem = new MyProblem(problem, member);
+        myProblemRepository.save(myProblem);
+
+
 
         // 디렉터리 경로 설정
         String basePath = System.getProperty("user.dir") + "/docker_problems_file";

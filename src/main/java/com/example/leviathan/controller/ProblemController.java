@@ -1,6 +1,7 @@
 package com.example.leviathan.controller;
 
 
+import com.example.leviathan.domain.Problem;
 import com.example.leviathan.dto.*;
 import com.example.leviathan.service.ProblemService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,4 +69,5 @@ public class ProblemController {
         List<Long> numbers = problemService.getAllProblemNumbers();
         return ResponseEntity.ok(numbers);
     }
+
 }
