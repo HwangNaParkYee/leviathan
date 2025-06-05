@@ -62,6 +62,62 @@ public class GeminiService {
         return parseResponse(content);
     }
 
+    public boolean checkPrompt(String topic) {
+        String filterPrompt = """
+당신은 리눅스 온라인 저지 문제를 만드는 AI입니다.
+
+[역할]
+- 당신의 유일한 임무는 '리눅스 명령어'와 직접 관련된 문제만을 만들 수 있도록 요청을 필터링하는 것입니다.
+
+[사용자 요청]
+"%s"
+
+[판단 기준]
+- 오직 리눅스 명령어(Bash 포함)로 터미널에서 실행 가능한 작업에 **직접적으로 관련된 요청**만 'YES'로 판단합니다.
+- 예: `touch`, `cd`, `ls`, `chmod`, `grep`, `ps`, `kill`, `cat`, `mkdir`, `rm`, `top`, `whoami`, `find`, `echo` 등
+
+[부적절 예시 — 모두 NO]
+- 정치, 뉴스, 사회, 감정 표현, 문장 생성, 상식 질문, 고양이, 농담, 인공지능, GPT 질문, 자연어 처리, 수학 문제, 파이썬, 자바 등
+- 리눅스와 관련된 것처럼 보이지만 **명령어 기반 문제로 만들 수 없는** 애매한 요청
+
+[출력 규칙]
+- 조건을 만족하면 "YES"
+- 하나라도 어긋나면 이유 불문하고 "NO"
+- 반드시 대답은 "YES" 또는 "NO"만 출력 (그 외 설명 금지)
+""".formatted(topic);
+
+        GeminiRequest request = new GeminiRequest(
+                List.of(new GeminiRequest.Content(
+                        List.of(new GeminiRequest.Part(filterPrompt))
+                ))
+        );
+
+        String url = baseUrl + "/v1beta/models/gemini-1.5-flash:generateContent?key=" + apiKey;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<GeminiRequest> entity = new HttpEntity<>(request, headers);
+
+        ResponseEntity<GeminiResponse> response = restTemplate.postForEntity(
+                url, entity, GeminiResponse.class
+        );
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Gemini API 호출 실패: " + response.getStatusCode());
+        }
+
+        String content = response.getBody()
+                .getCandidates().get(0)
+                .getContent().getParts().get(0)
+                .getText()
+                .trim();
+
+
+        System.out.println("[Gemini 필터 응답] content = " + content);
+
+        return content.equalsIgnoreCase("YES");
+    }
+
     private String buildPrompt(String topic, int level) {
         return """
                 당신은 리눅스 온라인 저지 시스템 문제를 만드는 AI입니다.

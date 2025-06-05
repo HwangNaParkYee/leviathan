@@ -26,7 +26,14 @@ public class PromptController {
     private final GeminiService geminiService;
 
     @PostMapping("/savePromptProblem")
-    public ResponseEntity<FindProblemDTO> savePromptProblem(@RequestBody UserPromptDTO dto) {
+    public ResponseEntity<?> savePromptProblem(@RequestBody UserPromptDTO dto) {
+        boolean isValid = geminiService.checkPrompt(dto.getPrompt());
+
+        if(!isValid) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("error", "요청하신 내용은 리눅스 실습 문제로 부적절합니다."));
+        }
         Long problemNumber =  promptService.savePromptProblem(dto);
         return problemService.findProblem(problemNumber);
     }
