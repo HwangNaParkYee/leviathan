@@ -1,5 +1,6 @@
 package com.example.leviathan.domain;
 
+import com.example.leviathan.dto.GptResult;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +21,7 @@ public class Problem {
     @Column(unique = true)  // 유니크 제약 조건 추가
     private Long number;
     private String title;
+    @Column(name = "question", columnDefinition = "TEXT")
     private String question;
     private String hint;
     private int lv;
@@ -32,5 +34,12 @@ public class Problem {
         this.lv = lv;
     }
 
+
+    public Problem(GptResult dto) {
+        this.title = dto.getTitle();
+        this.question = dto.getQuestion();
+        this.hint = dto.getHint();
+        this.lv = dto.getLevel();
+    }
 
 }

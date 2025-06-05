@@ -300,4 +300,44 @@ public class ProblemService {
         return problemRepository.findAllProblemNumbers();
     }
 
+    // 특정 문제의 좋아요 개수 조회
+    public Long getProblemLikeCount(Long problemId) {
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new RuntimeException("문제를 찾을 수 없습니다. ID: " + problemId));
+
+        return favoriteRepository.countByProblemId(problem);
+    }
+
+    // 로그인한 사용자가 좋아요 눌렀는지 체크
+    public boolean checkProblemLike(Long problemId, HttpServletRequest header) {
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
+        if (member == null) {
+            throw new RuntimeException("로그인한 사용자만 좋아요 확인이 가능합니다.");
+        }
+
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new RuntimeException("문제를 찾을 수 없습니다. ID: " + problemId));
+
+        // 좋아요가 있으면 true 반환, 없으면 false 반환
+        return favoriteRepository.findByProblemIdAndMemberId(problem, member).isPresent();
+    }
+
+    // 사용자가 좋아요한 문제들 조회
+    public List<ProblemLikeDTO> getUserLikedProblems(HttpServletRequest header) {
+        String token = jwtUtility.extractAccessTokenFromCookie(header);
+        Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
+
+        if (member == null) {
+            throw new RuntimeException("로그인한 사용자만 좋아요한 문제 조회가 가능합니다.");
+        }
+
+        return favoriteRepository.findByMemberId(member).stream()
+                .map(favorite -> {
+                    Problem problem = favorite.getProblemId();
+                    return new ProblemLikeDTO(problem);
+                })
+                .collect(Collectors.toList());
+    }
 }
