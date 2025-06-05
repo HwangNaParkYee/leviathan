@@ -63,12 +63,6 @@ public class ProblemController {
         return ResponseEntity.ok(result);
     }
 
-    @PostMapping("/likeUpProblem/{problemId}")
-    public ResponseEntity<String> likeUpProblem( @PathVariable Long problemId, HttpServletRequest header){
-        String result = problemService.likeUpProblem(header, problemId);
-        return ResponseEntity.ok(result);
-    }
-
     @GetMapping("/all-numbers")
     public ResponseEntity<List<Long>> getAllProblemNumbers() {
         List<Long> numbers = problemService.getAllProblemNumbers();
