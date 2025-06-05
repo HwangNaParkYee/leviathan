@@ -70,4 +70,10 @@ public class ProblemController {
         return ResponseEntity.ok(numbers);
     }
 
+    @GetMapping("/findMyProblem")
+    public ResponseEntity<List<MyProblemDTO>> getAllMyProblemNumbers(HttpServletRequest header) {
+        List<MyProblemDTO> Problems = problemService.getAllMyProblemNumbers(header);
+        return ResponseEntity.ok(Problems);
+    }
+
 }
