@@ -78,5 +78,10 @@ public class ReviewController {
     public ResponseEntity<MyPageStatisticsDTO> getStatistics(HttpServletRequest request) {
         return ResponseEntity.ok(reviewService.getStatistics(request));
     }
-
+    
+    // 문제별 통계 조회 API
+    @GetMapping("/problem-statistics/{problemId}")
+    public ResponseEntity<ProblemStatisticsDTO> getProblemStatistics(@PathVariable Long problemId) {
+        return ResponseEntity.ok(reviewService.getProblemStatistics(problemId));
+    }
 }

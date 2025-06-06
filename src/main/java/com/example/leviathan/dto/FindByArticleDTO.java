@@ -20,7 +20,7 @@ public class FindByArticleDTO {
     private String code;
     private String memberName;
     private Long likes;
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
 
     public FindByArticleDTO(Article article, Long likes) {
         this.articleId = article.getId();

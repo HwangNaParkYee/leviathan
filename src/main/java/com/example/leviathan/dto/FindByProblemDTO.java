@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class FindByProblemDTO {
     private Long problemNumber;
     private String title;
     private String memberId;
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
     private Long likes;
     private Long commentNumbers;
 
