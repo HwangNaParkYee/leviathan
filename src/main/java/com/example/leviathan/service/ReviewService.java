@@ -160,4 +160,20 @@ public class ReviewService {
     }
 
 
+    public ProblemStatisticsDTO getProblemStatistics(Long problemId) {
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new RuntimeException("문제를 찾을 수 없습니다. ID: " + problemId));
+        
+        // 총 제출 횟수
+        Long totalSubmissions = reviewRepository.countByProblemId(problem);
+        
+        // 정답 제출 횟수
+        Long correctSubmissions = reviewRepository.countByProblemIdAndIsRight(problem, 1L);
+        
+        // 문제를 맞힌 사용자 수
+        Long uniqueCorrectUsers = reviewRepository.countUniqueCorrectUsersByProblem(problem);
+        
+        return new ProblemStatisticsDTO(totalSubmissions, correctSubmissions, uniqueCorrectUsers);
+    }
+
 }

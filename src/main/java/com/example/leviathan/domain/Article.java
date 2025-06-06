@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -22,8 +23,8 @@ public class Article {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private Member memberId;
-    private LocalDate createDate;
-    private LocalDate updateDate;
+    private LocalDateTime createDate;
+    private LocalDateTime updateDate;
 
     public Article(Problem problemId, String title, String content,String code, Member memberId) {
         this.problemId = problemId;
@@ -31,7 +32,7 @@ public class Article {
         this.content = content;
         this.code = code;
         this.memberId = memberId;
-        this.createDate = LocalDate.now();
+        this.createDate = LocalDateTime.now();
         this.updateDate = this.createDate;
     }
 
@@ -39,6 +40,6 @@ public class Article {
         this.title = title;
         this.content = content;
         this.code = code;
-        this.updateDate = LocalDate.now();
+        this.updateDate = LocalDateTime.now();
     }
 }

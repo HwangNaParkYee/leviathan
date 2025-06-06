@@ -48,8 +48,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "AND r.problemId.id NOT IN (" +
             "   SELECT r2.problemId.id FROM Review r2 " +
             "   WHERE r2.memberId = :member AND r2.isRight = 1" +
-            ") " +
-            "AND r.isRight IS NULL")
+            ") ")
     List<SolvedProblemDTO> findWrongProblemsDetailedByMember(@Param("member") Member member);
 
 
@@ -72,5 +71,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT COUNT(r) FROM Review r WHERE r.memberId = :member")
     Long countAllSubmissions(@Param("member") Member member);
-
+    
+    // 문제별 통계를 위한 쿼리
+    @Query("SELECT COUNT(DISTINCT r.memberId.id) FROM Review r WHERE r.problemId = :problem AND r.isRight = 1")
+    Long countUniqueCorrectUsersByProblem(@Param("problem") Problem problem);
 }

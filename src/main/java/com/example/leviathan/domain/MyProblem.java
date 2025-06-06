@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,11 +24,11 @@ public class MyProblem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
-    private LocalDate createDate;
+    private LocalDateTime createDate;
 
     public MyProblem(Problem problem, Member member) {
         this.problem = problem;
         this.member = member;
-        this.createDate = LocalDate.now();
+        this.createDate = LocalDateTime.now();
     }
 }

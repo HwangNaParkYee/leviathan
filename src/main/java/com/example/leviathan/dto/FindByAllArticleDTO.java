@@ -4,6 +4,7 @@ import com.example.leviathan.domain.Article;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class FindByAllArticleDTO {
@@ -12,7 +13,7 @@ public class FindByAllArticleDTO {
     private String memberId;
     private Long problemNumber;
     private Long problemId;
-    private LocalDate updateDate;
+    private LocalDateTime updateDate;
     private Long likes;
     private Long commentsNumber;
 
