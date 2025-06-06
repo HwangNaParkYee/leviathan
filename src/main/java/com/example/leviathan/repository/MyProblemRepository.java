@@ -10,5 +10,5 @@ import java.util.List;
 public interface MyProblemRepository extends JpaRepository<MyProblem, Long> {
 
     // 특정 사용자가 만든 모든 문제 조회
-    List<MyProblem> findAllByMemberId(Member memberId);
+    List<MyProblem> findAllByMemberId(Long member_id);
 }

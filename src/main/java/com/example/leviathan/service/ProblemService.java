@@ -421,9 +421,9 @@ public class ProblemService {
             throw new RuntimeException("로그인을 해주세요.");
         }
 
-        return myProblemRepository.findAllByMemberId(member).stream()
+        return myProblemRepository.findAllByMemberId(member.getId()).stream()
                 .map(MyProblem -> {
-                    Problem problem = MyProblem.getProblemId();
+                    Problem problem = MyProblem.getProblem();
                     return new MyProblemDTO(problem);
                 })
                 .collect(Collectors.toList());

@@ -19,15 +19,15 @@ public class MyProblem {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Problem problemId;
+    private Problem problem;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member memberId;
+    private Member member;
     private LocalDate createDate;
 
     public MyProblem(Problem problem, Member member) {
-        this.problemId = problem;
-        this.memberId = member;
+        this.problem = problem;
+        this.member = member;
         this.createDate = LocalDate.now();
     }
 }
