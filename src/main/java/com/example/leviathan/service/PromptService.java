@@ -37,6 +37,8 @@ public class PromptService {
     public Long savePromptProblem(UserPromptDTO dto, HttpServletRequest header) {
         GptResult gptResult = geminiService.generateProblem(dto);
 
+        System.out.println(gptResult.getDockerfile() + gptResult.getHint() + "잘 왔습니다.");
+
         // 사용자 정보 조회
         String token = jwtUtility.extractAccessTokenFromCookie(header);
         Member member = memberRepository.findByMemberId(jwtUtility.getMemberIdFromToken(token));
