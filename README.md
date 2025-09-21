@@ -56,7 +56,7 @@ GUI에 익숙한 초급/전환기 개발자들이 터미널 환경에서 직접 
 |<img src="https://user-images.githubusercontent.com/80824750/208456048-acbf44a8-cd71-4132-b35a-500047adbe1c.gif" width="400"/>|<img src="https://user-images.githubusercontent.com/80824750/208456234-fb5fe434-aa65-4d7a-b955-89098d5bbe0b.gif" width="400"/>|
 
 ### 프로토타입
-<img src="https://user-images.githubusercontent.com/80824750/208454673-0449e49c-57c6-4a6b-86cf-66c5b1e623dc.png">
+<img width="1263" height="602" alt="Image" src="https://github.com/user-attachments/assets/4a4cce8d-8112-4baa-9f4d-7d7afb5b3c30" />
 
 <br />
 
