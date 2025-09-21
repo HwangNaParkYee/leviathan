@@ -72,13 +72,13 @@ GUI에 익숙한 초급/전환기 개발자들이 터미널 환경에서 직접 
 
 ## 🤔 기술적 이슈와 해결 과정
 - 도커 컨테이너 안에서 도커 명령어 사용
-    - [DOOD에 대하여](https://mari-laveau.tistory.com/107)
+    - [DOOD(Docker out of Docker) 방식](https://mari-laveau.tistory.com/107)
 
 
 <br />
 
 ## 💁‍♂️ 프로젝트 팀원
-|Backend|Frontend|
-|:---:|:---:|
-| ![](https://github.com/yewon-Noh.png?size=120) | ![](https://github.com/SeongHo-C.png?size=120) |
-|[노예원](https://github.com/yewon-Noh)|[이성호](https://github.com/SeongHo-C)|
+| Backend | Backend | Frontend |
+|:---:|:---:|:---:|
+| <img src="https://avatars.githubusercontent.com/u/121004914?v=4" width="120" height="120" /> | <img src="https://avatars.githubusercontent.com/u/86961575?v=4" width="120" /> | <img src="https://avatars.githubusercontent.com/u/130743812?v=4" width="120" />
+|[유진영](https://github.com/Yithian01)|[황성윤](https://github.com/KII1ua)|[박준범](https://github.com/ttotto0421)|
