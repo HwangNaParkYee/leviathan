@@ -3,15 +3,38 @@
 <!-- logo -->
 <img src="https://user-images.githubusercontent.com/80824750/208554611-f8277015-12e8-48d2-b2cc-d09d67f03c02.png" width="400"/>
 
-### Back-end Git Reamd.me Template ✅
+### LINUX ONLINE JUDGE 
 
-[<img src="https://img.shields.io/badge/-readme.md-important?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/-tech blog-blue?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/release-v0.0.0-yellow?style=flat&logo=google-chrome&logoColor=white" />]() 
-<br/> [<img src="https://img.shields.io/badge/프로젝트 기간-2022.12.10~2022.12.19-green?style=flat&logo=&logoColor=white" />]()
+![Static Badge](https://img.shields.io/badge/springboot-%236DB33F?logo=springboot&logoColor=ffffff)
+![Static Badge](https://img.shields.io/badge/docker-%232496ED?logo=docker&logoColor=ffffff)
+![Static Badge](https://img.shields.io/badge/vite-%23646CFF?logo=vite&logoColor=ffffff) 
+<br> ![Static Badge](https://img.shields.io/badge/nginx-%23009639?logo=nginx&logoColor=ffffff)
+![Static Badge](https://img.shields.io/badge/ubuntu-%23E95420?logo=ubuntu&logoColor=ffffff)
+![Static Badge](https://img.shields.io/badge/githubactions-%232088FF?logo=githubactions&logoColor=ffffff)
+![Static Badge](https://img.shields.io/badge/mysql-%234479A1?logo=mysql&logoColor=ffffff)
+
+
+<br/> ![Static Badge](https://img.shields.io/badge/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EA%B8%B0%EA%B0%84%3A-2025--03--02~2025--06-03--8A2BE2)
 
 </div> 
 
 ## 📝 소개
-백엔드 깃 레파지토리의 README.md를 빠르게 작성하기 위해 만든 템플릿입니다.
+CLI 환경 학습을 위한 **실습형 온라인 저지 플랫폼**입니다.  
+GUI에 익숙한 초급/전환기 개발자들이 터미널 환경에서 직접 명령어를 입력하고,  
+문제를 해결하며 자연스럽게 CLI를 학습할 수 있도록 돕는 서비스입니다.
+
+## 📌 주요 특징
+- **웹 기반 CLI 실습 환경**  
+  추가 설치 없이 브라우저에서 바로 CLI 학습 가능
+- **실전형 문제 제공**  
+  예: 서버 접속, 로그 확인, 폴더/파일 생성, 권한 설정 등
+- **다양한 난이도**  
+  기초 명령어(ls, cd, mkdir)부터 스크립트, 자동화 명령어까지
+- **커뮤니티 기능**  
+  질문/답변 게시판, 댓글, 좋아요 기능 제공
+- **학습 피드백**  
+  제출 내역, 전체 제출 현황, 개인 통계, 잔디 기능 제공
+
 
 다음과 같은 내용을 작성할 수 있습니다.
 - 프로젝트 소개
@@ -21,8 +44,6 @@
 - 프로젝트 아키텍쳐
 - 기술적 이슈와 해결 과정
 - 프로젝트 팀원
-
-필요한 기술 스택에 대한 logo는 [skills 폴더](/skills/)에서 다운로드 받을 수 있습니다.
 
 <br />
 
