@@ -94,7 +94,7 @@ GUI에 익숙한 초급/전환기 개발자들이 터미널 환경에서 직접 
 <br />
 
 ## 🛠️ 프로젝트 아키텍쳐
-![no-image](https://user-images.githubusercontent.com/80824750/208294567-738dd273-e137-4bbf-8307-aff64258fe03.png)
+<img width="1170" height="463" alt="Image" src="https://github.com/user-attachments/assets/119fa624-6dea-475f-b862-4666d178e460" />
 
 
 
