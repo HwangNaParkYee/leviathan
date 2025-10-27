@@ -44,7 +44,7 @@ GUI에 익숙한 초급/전환기 개발자들이 터미널 환경에서 직접 
 ### 화면 구성
 |문제 풀이|문제 생성|
 |:---:|:---:|
-|![Image](https://github.com/user-attachments/assets/99f76a25-effb-4a17-b8d1-c21e6d4c55d6)|![Image](https://github.com/user-attachments/assets/a0eaee37-44cf-4395-af7b-3928105ddc97)|
+|![Image](https://github.com/user-attachments/assets/99f76a25-effb-4a17-b8d1-c21e6d4c55d6)|![Image](https://github.com/user-attachments/assets/d2eecf65-7f57-4016-9f94-c0cac907c11a)|
 
 <br>
 
