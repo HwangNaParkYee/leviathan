@@ -2,10 +2,28 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
+
+jacoco {
+	toolVersion = "0.8.12"
+}
+
+jacocoTestReport {
+	dependsOn test // 테스트가 성공해야 리포트를 만듭니다.
+	reports {
+		html.required = true // 브라우저에서 볼 수 있는 HTML 형식
+		xml.required = true  // 소나큐브 등 외부 도구 연동용
+	}
+}
+
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
 
 java {
 	toolchain {
