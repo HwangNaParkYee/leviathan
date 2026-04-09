@@ -1,7 +1,7 @@
 <div align="center">
 
 <!-- logo -->
-<img width="1472" height="704" alt="Image" src="https://github.com/user-attachments/assets/289309bb-b94d-43d4-a25e-30345ca7418f" width = "400"/>
+<img width="1472" height="704" alt="Image" src="https://github.com/user-attachments/assets/6b99130f-7134-4f39-86e6-b5fb28831be5" />
 
 ### LINUX ONLINE JUDGE 
 
