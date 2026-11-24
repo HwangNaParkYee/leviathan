@@ -1,16 +1,14 @@
 package com.example.leviathan.member.controller;
 
-
+import com.example.leviathan.common.AccessTokenCookie;
+import com.example.leviathan.common.LeviathanResponse;
+import com.example.leviathan.common.annotation.LoginId;
 import com.example.leviathan.member.controller.request.LoginRequest;
 import com.example.leviathan.member.controller.request.SignUpRequest;
 import com.example.leviathan.member.facade.MemberFacade;
-import com.example.leviathan.common.AccessTokenCookie;
-import com.example.leviathan.common.annotation.LoginId;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -23,54 +21,40 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberFacade memberFacade;
-
-
     @PostMapping("/signUp")
-    public ResponseEntity<String> signUp(@RequestBody SignUpRequest dto){
-        return memberFacade.signUp(dto);
+    public ResponseEntity<LeviathanResponse<Void>> signUp(@RequestBody SignUpRequest dto) {
+        memberFacade.signUp(dto);
+        return ResponseEntity.ok().body(LeviathanResponse.success());
     }
-
     @DeleteMapping("/deleteMember/{memberId}")
-    public ResponseEntity<String> deleteMember(@PathVariable Long memberId){
-
-        // 토근 검증 로직도 나중에 구현 현재는 개발중이라 보류
-        // memberService에서 삭제 로직 수행
-        return memberFacade.deleteMember(memberId);
+    public ResponseEntity<LeviathanResponse<Void>> deleteMember(@PathVariable Long memberId) {
+        memberFacade.deleteMember(memberId);
+        return ResponseEntity.ok().body(LeviathanResponse.success());
     }
-
-
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginRequest dto){
-        return memberFacade.login(dto);
+    public ResponseEntity<LeviathanResponse<Void>> login(@RequestBody LoginRequest dto) {
+        String accessToken = memberFacade.login(dto);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, AccessTokenCookie.of(accessToken).toString())
+                .body(LeviathanResponse.success());
     }
-
-
     @PostMapping("/logout")
-    public ResponseEntity<Object> logout(@LoginId String loginId, HttpServletResponse response) {
-
-
+    public ResponseEntity<LeviathanResponse<Void>> logout(@LoginId String loginId) {
         memberFacade.logout(loginId);
-
-        // "accessToken"과 같은 이름으로 저장된 쿠키를 삭제
-        ResponseCookie accessTokenCookie = AccessTokenCookie.expired();
-
-        // 응답 헤더에 쿠키 삭제 정보 추가
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-
-        // 로그아웃 성공 메시지 응답
-        return ResponseEntity.ok("로그아웃 성공");
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, AccessTokenCookie.expired().toString())
+                .body(LeviathanResponse.success());
     }
-
-    //로그인 확인
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<LeviathanResponse<Map<String, Object>>> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("isAuthenticated", false));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(LeviathanResponse.fail("UNAUTHORIZED", "로그인이 필요합니다.", Map.of("isAuthenticated", false)));
         }
 
-        return ResponseEntity.ok(Map.of(
+        return ResponseEntity.ok().body(LeviathanResponse.success(Map.of(
                 "isAuthenticated", true,
                 "username", authentication.getName()
-        ));
+        )));
     }
 }

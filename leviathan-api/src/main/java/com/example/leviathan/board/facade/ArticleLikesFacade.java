@@ -4,9 +4,10 @@ import com.example.leviathan.board.db.entity.Article;
 import com.example.leviathan.board.service.ArticleLikesService;
 import com.example.leviathan.board.service.ArticleService;
 import com.example.leviathan.member.db.entity.Member;
+import com.example.leviathan.member.exception.MemberErrorCode;
+import com.example.leviathan.member.exception.MemberException;
 import com.example.leviathan.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,28 +21,26 @@ public class ArticleLikesFacade {
     private final MemberService memberService;
 
     @Transactional
-    public ResponseEntity<String> toggleLike(String loginId, Long articleId) {
-        Member member = memberService.findByLoginId(loginId);
+    public void toggleLike(String loginId, Long articleId) {
+        Member member = getMember(loginId);
         Article article = articleService.getById(articleId);
 
-        if (articleLikesService.toggle(member, article)) {
-            return ResponseEntity.ok("좋아요 성공");
-        }
-        return ResponseEntity.ok("좋아요 취소!!");
+        articleLikesService.toggle(member, article);
     }
 
-    public ResponseEntity<String> findByArticleIdMemberArticleLike(String loginId, Long articleId) {
-        Member member = memberService.findByLoginId(loginId);
-
-        if (member == null) {
-            return ResponseEntity.ok("사용자 없음");
-        }
-
+    public boolean isLiked(String loginId, Long articleId) {
+        Member member = getMember(loginId);
         Article article = articleService.getById(articleId);
 
-        if (articleLikesService.isLiked(member, article)) {
-            return ResponseEntity.ok("좋아요 있음");
+        return articleLikesService.isLiked(member, article);
+    }
+
+    private Member getMember(String loginId) {
+        Member member = memberService.findByLoginId(loginId);
+        if (member == null) {
+            throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
         }
-        return ResponseEntity.ok("좋아요 없음");
+
+        return member;
     }
 }

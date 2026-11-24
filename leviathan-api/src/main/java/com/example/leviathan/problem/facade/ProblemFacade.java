@@ -2,6 +2,7 @@ package com.example.leviathan.problem.facade;
 
 import com.example.leviathan.member.exception.MemberErrorCode;
 import com.example.leviathan.member.exception.MemberException;
+import com.example.leviathan.problem.exception.ProblemErrorCode;
 import com.example.leviathan.problem.exception.ProblemException;
 
 import com.example.leviathan.member.db.entity.Member;
@@ -22,8 +23,6 @@ import com.example.leviathan.review.db.entity.Review;
 import com.example.leviathan.review.service.ReviewService;
 import com.example.leviathan.review.service.SubmissionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,50 +42,39 @@ public class ProblemFacade {
     private final SubmissionService submissionService;
     private final MemberService memberService;
 
-    // 서비스가 던진 예외를 여기서 응답으로 바꾸므로 Facade에서는 트랜잭션을 열지 않는다
-    // (트랜잭션을 열면 rollback-only로 표시되어 응답 대신 500이 나간다)
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public ResponseEntity<String> saveProblem(SaveProblemRequest dto) {
-        try {
-            problemService.create(dto.number(), dto.title(), dto.question(), dto.hint(), dto.lv());
-        } catch (ProblemException e) {
-            // 해당 번호의 문제가 이미 존재하면, 에러 메시지 반환
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Problem with this number already exists");
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body("Problem saved successfully");
+    @Transactional
+    public void saveProblem(SaveProblemRequest dto) {
+        problemService.create(dto.number(), dto.title(), dto.question(), dto.hint(), dto.lv());
     }
 
-    public ResponseEntity<FindProblemResponse> findProblem(Long problemId) {
-        return toFindProblemResponse(problemService.findById(problemId));
+    public FindProblemResponse findProblem(Long problemId) {
+        return toFindProblemResponse(problemService.getById(problemId));
     }
 
-    public ResponseEntity<FindProblemResponse> findByProblemNumber(Long problemNumber) {
-        return toFindProblemResponse(problemService.findByNumber(problemNumber));
+    public FindProblemResponse findByProblemNumber(Long problemNumber) {
+        Problem problem = problemService.findByNumber(problemNumber)
+                .orElseThrow(() -> new ProblemException(ProblemErrorCode.PROBLEM_NOT_FOUND));
+
+        return toFindProblemResponse(problem);
     }
 
-    // 문제를 찾지 못하면 404 Not Found 반환
-    private ResponseEntity<FindProblemResponse> toFindProblemResponse(Optional<Problem> problem) {
-        return problem
-                .map(p -> ResponseEntity.ok(FindProblemResponse.of(p, favoriteService.count(p), reviewService.correctRate(p))))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    private FindProblemResponse toFindProblemResponse(Problem problem) {
+        return FindProblemResponse.of(problem, favoriteService.count(problem), reviewService.correctRate(problem));
     }
 
     public List<FindByAllProblemResponse> findByAllProblem() {
         return problemService.findAll().stream()
-                .map(problem -> new FindByAllProblemResponse(
-                        problem.getId(),
-                        problem.getNumber(),
-                        problem.getTitle(),
-                        favoriteService.count(problem),  // 좋아요 개수
-                        problem.getLv(),
+                .map(problem -> FindByAllProblemResponse.of(
+                        problem,
+                        favoriteService.count(problem),
                         reviewService.correctRate(problem)
                 ))
                 .toList();
     }
 
     @Transactional
-    public Problem updateProblem(UpdateProblemRequest dto) {
-        return problemService.update(dto.problemId(), dto.problemNumber(), dto.title(), dto.question(), dto.hint(), dto.lv());
+    public void updateProblem(UpdateProblemRequest dto) {
+        problemService.update(dto.problemId(), dto.problemNumber(), dto.title(), dto.question(), dto.hint(), dto.lv());
     }
 
     public String runProblem(SubmitProblemRequest dto) {
@@ -110,8 +98,6 @@ public class ProblemFacade {
         }
     }
 
-    // 서비스가 던진 예외를 여기서 응답으로 바꾸므로 Facade에서는 트랜잭션을 열지 않는다
-    // (트랜잭션을 열면 rollback-only로 표시되어 응답 대신 500이 나간다)
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String submitProblem(String loginId, SubmitProblemRequest dto) {
         Optional<Problem> problem = problemService.findById(dto.problemId());
@@ -143,23 +129,19 @@ public class ProblemFacade {
         return problemService.findAllNumbers();
     }
 
-    // 특정 문제의 좋아요 개수 조회
     public Long getProblemLikeCount(Long problemId) {
         return favoriteService.count(problemService.getById(problemId));
     }
 
-    // 로그인한 사용자가 좋아요 눌렀는지 체크
     public boolean checkProblemLike(Long problemId, String loginId) {
         Member member = memberService.findByLoginId(loginId);
         if (member == null) {
             throw new MemberException(MemberErrorCode.MEMBER_NOT_FOUND);
         }
 
-        // 좋아요가 있으면 true 반환, 없으면 false 반환
         return favoriteService.isLiked(member, problemService.getById(problemId));
     }
 
-    // 사용자가 좋아요한 문제들 조회
     public List<ProblemLikeResponse> getUserLikedProblems(String loginId) {
         Member member = memberService.findByLoginId(loginId);
         if (member == null) {
@@ -171,7 +153,6 @@ public class ProblemFacade {
                 .toList();
     }
 
-    // 사용자가 생성한 문제들 조회
     public List<MyProblemResponse> getAllMyProblemNumbers(String loginId) {
         Member member = memberService.findByLoginId(loginId);
         if (member == null) {

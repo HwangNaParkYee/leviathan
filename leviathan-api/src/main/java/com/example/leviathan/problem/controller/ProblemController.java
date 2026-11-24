@@ -1,16 +1,14 @@
 package com.example.leviathan.problem.controller;
 
-import com.example.leviathan.problem.facade.response.FindByAllProblemResponse;
-import com.example.leviathan.problem.facade.response.FindProblemResponse;
-import com.example.leviathan.problem.facade.response.MyProblemResponse;
+import com.example.leviathan.common.LeviathanResponse;
+import com.example.leviathan.common.annotation.LoginId;
 import com.example.leviathan.problem.controller.request.SaveProblemRequest;
 import com.example.leviathan.problem.controller.request.SubmitProblemRequest;
 import com.example.leviathan.problem.controller.request.UpdateProblemRequest;
-
-
-import com.example.leviathan.problem.db.entity.Problem;
 import com.example.leviathan.problem.facade.ProblemFacade;
-import com.example.leviathan.common.annotation.LoginId;
+import com.example.leviathan.problem.facade.response.FindByAllProblemResponse;
+import com.example.leviathan.problem.facade.response.FindProblemResponse;
+import com.example.leviathan.problem.facade.response.MyProblemResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,63 +21,42 @@ import java.util.List;
 public class ProblemController {
 
     private final ProblemFacade problemFacade;
-
     @PostMapping("/saveProblem")
-    public ResponseEntity<String> saveProblem(@RequestBody SaveProblemRequest dto){
-        return problemFacade.saveProblem(dto);
+    public ResponseEntity<LeviathanResponse<Void>> saveProblem(@RequestBody SaveProblemRequest dto) {
+        problemFacade.saveProblem(dto);
+        return ResponseEntity.ok().body(LeviathanResponse.success());
     }
-
-
     @GetMapping("/findProblem/{problemId}")
-    public ResponseEntity<FindProblemResponse> findProblem(@PathVariable Long problemId){
-        return problemFacade.findProblem(problemId);
+    public ResponseEntity<LeviathanResponse<FindProblemResponse>> findProblem(@PathVariable Long problemId) {
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.findProblem(problemId)));
     }
-
     @GetMapping("/findByProblemNumber/{problemNumber}")
-    public ResponseEntity<FindProblemResponse> findByProblemNumber(@PathVariable Long problemNumber){
-        return problemFacade.findByProblemNumber(problemNumber);
+    public ResponseEntity<LeviathanResponse<FindProblemResponse>> findByProblemNumber(@PathVariable Long problemNumber) {
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.findByProblemNumber(problemNumber)));
     }
-
-
     @GetMapping("/public/findByAllProblem")
-    public ResponseEntity<List<FindByAllProblemResponse>> findByAllProblem(){
-        List<FindByAllProblemResponse> problems = problemFacade.findByAllProblem();
-        return ResponseEntity.ok(problems);
+    public ResponseEntity<LeviathanResponse<List<FindByAllProblemResponse>>> findByAllProblem() {
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.findByAllProblem()));
     }
-
     @PutMapping("/updateProblem")
-    public ResponseEntity<String> updateProblem(@RequestBody UpdateProblemRequest dto) {
-        try {
-            problemFacade.updateProblem(dto);
-            return ResponseEntity.ok("Problem updated successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(400).body("Error: " + e.getMessage());
-        }
+    public ResponseEntity<LeviathanResponse<Void>> updateProblem(@RequestBody UpdateProblemRequest dto) {
+        problemFacade.updateProblem(dto);
+        return ResponseEntity.ok().body(LeviathanResponse.success());
     }
-
     @PostMapping("/runProblem")
-    public ResponseEntity<String> runProblem(@RequestBody SubmitProblemRequest dto) {
-        String result = problemFacade.runProblem(dto);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<LeviathanResponse<String>> runProblem(@RequestBody SubmitProblemRequest dto) {
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.runProblem(dto)));
     }
-
-
     @PostMapping("/submitProblem")
-    public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemRequest dto, @LoginId String loginId) {
-        String result = problemFacade.submitProblem(loginId, dto);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<LeviathanResponse<String>> submitProblem(@RequestBody SubmitProblemRequest dto, @LoginId String loginId) {
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.submitProblem(loginId, dto)));
     }
-
     @GetMapping("/all-numbers")
-    public ResponseEntity<List<Long>> getAllProblemNumbers() {
-        List<Long> numbers = problemFacade.getAllProblemNumbers();
-        return ResponseEntity.ok(numbers);
+    public ResponseEntity<LeviathanResponse<List<Long>>> getAllProblemNumbers() {
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.getAllProblemNumbers()));
     }
-
     @GetMapping("/findMyProblem")
-    public ResponseEntity<List<MyProblemResponse>> getAllMyProblemNumbers(@LoginId String loginId) {
-        List<MyProblemResponse> Problems = problemFacade.getAllMyProblemNumbers(loginId);
-        return ResponseEntity.ok(Problems);
+    public ResponseEntity<LeviathanResponse<List<MyProblemResponse>>> getAllMyProblemNumbers(@LoginId String loginId) {
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.getAllMyProblemNumbers(loginId)));
     }
-
 }

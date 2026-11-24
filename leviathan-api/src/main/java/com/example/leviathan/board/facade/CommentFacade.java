@@ -27,7 +27,6 @@ public class CommentFacade {
     private final ArticleService articleService;
     private final MemberService memberService;
 
-    //댓글 달기
     @Transactional
     public SaveCommentResponse saveComment(SaveCommentRequest dto, String loginId) {
         Member member = memberService.findByLoginId(loginId);
@@ -36,7 +35,6 @@ public class CommentFacade {
         return SaveCommentResponse.from(commentService.write(member, article, dto.content()));
     }
 
-    //댓글 업데이트
     @Transactional
     public UpdateCommentResponse updateComment(Long commentId, UpdateCommentRequest dto, String loginId) {
         Member member = memberService.findByLoginId(loginId);
@@ -50,20 +48,11 @@ public class CommentFacade {
         commentService.delete(commentId, member);
     }
 
-    //댓글 찾기
     public List<FindByArticleIdCommentResponse> getCommentsByArticleId(Long articleId) {
         Article article = articleService.getById(articleId);
 
         return commentService.findByArticle(article).stream()
-                .map(comment -> new FindByArticleIdCommentResponse(
-                        comment.getId(),
-                        comment.getArticleId().getId(),
-                        comment.getMemberId().getMemberId(),
-                        comment.getContent(),
-                        comment.getCreatedAt(),
-                        comment.getUpdatedAt(),
-                        commentLikesService.count(comment)
-                ))
+                .map(comment -> FindByArticleIdCommentResponse.of(comment, commentLikesService.count(comment)))
                 .toList();
     }
 }
