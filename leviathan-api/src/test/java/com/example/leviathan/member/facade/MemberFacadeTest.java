@@ -5,8 +5,8 @@ import com.example.leviathan.member.exception.MemberException;
 
 import com.example.leviathan.common.JwtUtility;
 import com.example.leviathan.member.db.entity.Member;
-import com.example.leviathan.member.dto.LoginDTO;
-import com.example.leviathan.member.dto.SignUpDTO;
+import com.example.leviathan.member.controller.request.LoginRequest;
+import com.example.leviathan.member.controller.request.SignUpRequest;
 import com.example.leviathan.member.service.MemberService;
 import com.example.leviathan.member.service.RefreshTokenService;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +50,7 @@ class MemberFacadeTest {
     @DisplayName("회원가입 성공 테스트")
     void signUp_Success() {
         // given (준비)
-        SignUpDTO dto = new SignUpDTO("testUser", "password123");
+        SignUpRequest dto = new SignUpRequest("testUser", "password123");
         when(passwordEncoder.encode("password123")).thenReturn("encrypted");
 
         // when (실행)
@@ -68,7 +68,7 @@ class MemberFacadeTest {
     @DisplayName("중복 회원가입 실패 테스트")
     void signUp_Fail_Duplicate() {
         // given
-        SignUpDTO dto = new SignUpDTO("duplicateUser", "1234");
+        SignUpRequest dto = new SignUpRequest("duplicateUser", "1234");
         when(passwordEncoder.encode("1234")).thenReturn("encrypted");
         when(memberService.register("duplicateUser", "encrypted")).thenThrow(new MemberException(MemberErrorCode.MEMBER_ALREADY_REGISTERED));
 
@@ -83,11 +83,11 @@ class MemberFacadeTest {
     @Test
     @DisplayName("로그인 성공 테스트")
     void login_Success() {
-        LoginDTO dto = new LoginDTO("testUser", "password123");
+        LoginRequest dto = new LoginRequest("testUser", "password123");
 
         Member member = new Member("testUser", "encryptedpassword");
         when(memberService.findByLoginId("testUser")).thenReturn(member);
-        when(passwordEncoder.matches(dto.getPassword(), member.getPassword())).thenReturn(true);
+        when(passwordEncoder.matches(dto.password(), member.getPassword())).thenReturn(true);
         when(jwtUtility.generateToken(anyString(), any())).thenReturn("accessToken");
         when(jwtUtility.generateRefreshToken(anyString())).thenReturn("refreshToken");
 
@@ -104,7 +104,7 @@ class MemberFacadeTest {
     @Test
     @DisplayName("비밀번호가 틀리면 로그인 실패")
     void login_Fail_WrongPassword() {
-        LoginDTO dto = new LoginDTO("testUser", "wrong");
+        LoginRequest dto = new LoginRequest("testUser", "wrong");
 
         Member member = new Member("testUser", "encryptedpassword");
         when(memberService.findByLoginId("testUser")).thenReturn(member);

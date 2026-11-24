@@ -8,11 +8,11 @@ import com.example.leviathan.review.model.MemberStatistics;
 import com.example.leviathan.review.model.ProblemStatistics;
 import com.example.leviathan.review.db.entity.Review;
 import com.example.leviathan.review.model.SolvedProblem;
-import com.example.leviathan.review.dto.ActivityHistoryDTO;
-import com.example.leviathan.review.dto.MyPageStatisticsDTO;
-import com.example.leviathan.review.dto.ProblemStatisticsDTO;
-import com.example.leviathan.review.dto.ReviewDTO;
-import com.example.leviathan.review.dto.SolvedProblemDTO;
+import com.example.leviathan.review.facade.response.ActivityHistoryResponse;
+import com.example.leviathan.review.facade.response.MyPageStatisticsResponse;
+import com.example.leviathan.review.facade.response.ProblemStatisticsResponse;
+import com.example.leviathan.review.facade.response.ReviewResponse;
+import com.example.leviathan.review.facade.response.SolvedProblemResponse;
 import com.example.leviathan.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,72 +30,72 @@ public class ReviewFacade {
     private final ProblemService problemService;
     private final MemberService memberService;
 
-    public List<ReviewDTO> getAllReviews() {
-        return toReviewDTOs(reviewService.findAll());
+    public List<ReviewResponse> getAllReviews() {
+        return toReviewResponses(reviewService.findAll());
     }
 
     // problemId로 리뷰 검색
-    public List<ReviewDTO> findByProblemIdReview(Long problemId) {
+    public List<ReviewResponse> findByProblemIdReview(Long problemId) {
         Problem problem = problemService.getById(problemId);
-        return toReviewDTOs(reviewService.findByProblem(problem));
+        return toReviewResponses(reviewService.findByProblem(problem));
     }
 
-    public List<ReviewDTO> findByProblemIdMemberIdReview(Long problemId, String loginId) {
+    public List<ReviewResponse> findByProblemIdMemberIdReview(Long problemId, String loginId) {
         Member member = memberService.findByLoginId(loginId);
         Problem problem = problemService.getById(problemId);
-        return toReviewDTOs(reviewService.findByProblemAndMember(problem, member));
+        return toReviewResponses(reviewService.findByProblemAndMember(problem, member));
     }
 
-    public List<ReviewDTO> findByMemberIdReview(String loginId) {
+    public List<ReviewResponse> findByMemberIdReview(String loginId) {
         Member member = memberService.findByLoginId(loginId);
-        return toReviewDTOs(reviewService.findByMember(member));
+        return toReviewResponses(reviewService.findByMember(member));
     }
 
-    public ResponseEntity<ReviewDTO> findByReviewId(Long reviewId) {
-        return ResponseEntity.ok(ReviewDTO.fromEntity(reviewService.getById(reviewId)));
+    public ResponseEntity<ReviewResponse> findByReviewId(Long reviewId) {
+        return ResponseEntity.ok(ReviewResponse.from(reviewService.getById(reviewId)));
     }
 
     //멤버 별로 맞은 문제 가져오기
-    public List<SolvedProblemDTO> findSolvedProblems(String loginId) {
+    public List<SolvedProblemResponse> findSolvedProblems(String loginId) {
         Member member = memberService.findByLoginId(loginId);
-        return toSolvedProblemDTOs(reviewService.findSolvedProblems(member));
+        return toSolvedProblemResponses(reviewService.findSolvedProblems(member));
     }
 
     //멤버 별로 틀린 문제 가져오기
-    public List<SolvedProblemDTO> findWrongProblems(String loginId) {
+    public List<SolvedProblemResponse> findWrongProblems(String loginId) {
         Member member = memberService.findByLoginId(loginId);
-        return toSolvedProblemDTOs(reviewService.findWrongProblems(member));
+        return toSolvedProblemResponses(reviewService.findWrongProblems(member));
     }
 
     //잔디용
-    public List<ActivityHistoryDTO> getActivityHistory(String loginId) {
+    public List<ActivityHistoryResponse> getActivityHistory(String loginId) {
         Member member = memberService.findByLoginId(loginId);
         return reviewService.getActivityHistory(member).stream()
-                .map(activity -> new ActivityHistoryDTO(activity.date(), activity.count()))
+                .map(activity -> new ActivityHistoryResponse(activity.date(), activity.count()))
                 .toList();
     }
 
     //총 푼 문제 갯수, 도전한 문제 갯수, 제출 횟수
-    public MyPageStatisticsDTO getStatistics(String loginId) {
+    public MyPageStatisticsResponse getStatistics(String loginId) {
         Member member = memberService.findByLoginId(loginId);
         MemberStatistics statistics = reviewService.getStatistics(member);
-        return new MyPageStatisticsDTO(statistics.totalSolved(), statistics.totalTried(), statistics.totalSubmissions());
+        return new MyPageStatisticsResponse(statistics.totalSolved(), statistics.totalTried(), statistics.totalSubmissions());
     }
 
-    public ProblemStatisticsDTO getProblemStatistics(Long problemId) {
+    public ProblemStatisticsResponse getProblemStatistics(Long problemId) {
         ProblemStatistics statistics = reviewService.getProblemStatistics(problemService.getById(problemId));
-        return new ProblemStatisticsDTO(statistics.totalSubmissions(), statistics.correctSubmissions(), statistics.uniqueCorrectUsers());
+        return new ProblemStatisticsResponse(statistics.totalSubmissions(), statistics.correctSubmissions(), statistics.uniqueCorrectUsers());
     }
 
-    private List<ReviewDTO> toReviewDTOs(List<Review> reviews) {
+    private List<ReviewResponse> toReviewResponses(List<Review> reviews) {
         return reviews.stream()
-                .map(ReviewDTO::fromEntity)  // fromEntity()로 DTO 변환
+                .map(ReviewResponse::from)
                 .toList();
     }
 
-    private List<SolvedProblemDTO> toSolvedProblemDTOs(List<SolvedProblem> problems) {
+    private List<SolvedProblemResponse> toSolvedProblemResponses(List<SolvedProblem> problems) {
         return problems.stream()
-                .map(problem -> new SolvedProblemDTO(problem.problemId(), problem.problemNumber()))
+                .map(problem -> new SolvedProblemResponse(problem.problemId(), problem.problemNumber()))
                 .toList();
     }
 }

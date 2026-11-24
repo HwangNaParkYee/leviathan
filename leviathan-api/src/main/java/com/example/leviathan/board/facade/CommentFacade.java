@@ -1,11 +1,11 @@
 package com.example.leviathan.board.facade;
 
 import com.example.leviathan.board.db.entity.Article;
-import com.example.leviathan.board.dto.CommentDTO;
-import com.example.leviathan.board.dto.CommentResponseDTO;
-import com.example.leviathan.board.dto.FindByArticleIdCommentDTO;
-import com.example.leviathan.board.dto.SaveCommentDTO;
-import com.example.leviathan.board.dto.UpdateCommentDTO;
+import com.example.leviathan.board.facade.response.SaveCommentResponse;
+import com.example.leviathan.board.facade.response.UpdateCommentResponse;
+import com.example.leviathan.board.facade.response.FindByArticleIdCommentResponse;
+import com.example.leviathan.board.controller.request.SaveCommentRequest;
+import com.example.leviathan.board.controller.request.UpdateCommentRequest;
 import com.example.leviathan.board.service.ArticleService;
 import com.example.leviathan.board.service.CommentLikesService;
 import com.example.leviathan.board.service.CommentService;
@@ -29,19 +29,19 @@ public class CommentFacade {
 
     //댓글 달기
     @Transactional
-    public CommentDTO saveComment(SaveCommentDTO dto, String loginId) {
+    public SaveCommentResponse saveComment(SaveCommentRequest dto, String loginId) {
         Member member = memberService.findByLoginId(loginId);
-        Article article = articleService.getById(dto.getArticleId());
+        Article article = articleService.getById(dto.articleId());
 
-        return new CommentDTO(commentService.write(member, article, dto.getContent()));
+        return SaveCommentResponse.from(commentService.write(member, article, dto.content()));
     }
 
     //댓글 업데이트
     @Transactional
-    public CommentResponseDTO updateComment(Long commentId, UpdateCommentDTO dto, String loginId) {
+    public UpdateCommentResponse updateComment(Long commentId, UpdateCommentRequest dto, String loginId) {
         Member member = memberService.findByLoginId(loginId);
 
-        return new CommentResponseDTO(commentService.edit(commentId, member, dto.getContent()));
+        return UpdateCommentResponse.from(commentService.edit(commentId, member, dto.content()));
     }
 
     @Transactional
@@ -51,11 +51,11 @@ public class CommentFacade {
     }
 
     //댓글 찾기
-    public List<FindByArticleIdCommentDTO> getCommentsByArticleId(Long articleId) {
+    public List<FindByArticleIdCommentResponse> getCommentsByArticleId(Long articleId) {
         Article article = articleService.getById(articleId);
 
         return commentService.findByArticle(article).stream()
-                .map(comment -> new FindByArticleIdCommentDTO(
+                .map(comment -> new FindByArticleIdCommentResponse(
                         comment.getId(),
                         comment.getArticleId().getId(),
                         comment.getMemberId().getMemberId(),
