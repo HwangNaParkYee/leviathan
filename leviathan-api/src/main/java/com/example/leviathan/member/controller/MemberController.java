@@ -18,19 +18,25 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class MemberController {
+public class MemberController implements MemberApi {
 
     private final MemberFacade memberFacade;
+
+    @Override
     @PostMapping("/signUp")
     public ResponseEntity<LeviathanResponse<Void>> signUp(@RequestBody SignUpRequest dto) {
         memberFacade.signUp(dto);
         return ResponseEntity.ok().body(LeviathanResponse.success());
     }
+
+    @Override
     @DeleteMapping("/deleteMember/{memberId}")
     public ResponseEntity<LeviathanResponse<Void>> deleteMember(@PathVariable Long memberId) {
         memberFacade.deleteMember(memberId);
         return ResponseEntity.ok().body(LeviathanResponse.success());
     }
+
+    @Override
     @PostMapping("/login")
     public ResponseEntity<LeviathanResponse<Void>> login(@RequestBody LoginRequest dto) {
         String accessToken = memberFacade.login(dto);
@@ -38,6 +44,8 @@ public class MemberController {
                 .header(HttpHeaders.SET_COOKIE, AccessTokenCookie.of(accessToken).toString())
                 .body(LeviathanResponse.success());
     }
+
+    @Override
     @PostMapping("/logout")
     public ResponseEntity<LeviathanResponse<Void>> logout(@LoginId String loginId) {
         memberFacade.logout(loginId);
@@ -45,6 +53,8 @@ public class MemberController {
                 .header(HttpHeaders.SET_COOKIE, AccessTokenCookie.expired().toString())
                 .body(LeviathanResponse.success());
     }
+
+    @Override
     @GetMapping("/me")
     public ResponseEntity<LeviathanResponse<Map<String, Object>>> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

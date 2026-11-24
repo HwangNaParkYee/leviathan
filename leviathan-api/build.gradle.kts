@@ -19,4 +19,5 @@ dependencies {
     //security
     implementation(Dependencies.SpringBoot.SECURITY)
 
+	implementation(Dependencies.Swagger.SPRINGDOC)
 }

@@ -13,21 +13,29 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/problem_likes")
 @RequiredArgsConstructor
-public class ProblemLikesController {
+public class ProblemLikesController implements ProblemLikesApi {
 
     private final ProblemFacade problemFacade;
+
+    @Override
     @PostMapping("/{problemId}")
     public ResponseEntity<LeviathanResponse<String>> toggleProblemLike(@PathVariable Long problemId, @LoginId String loginId) {
         return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.likeUpProblem(loginId, problemId)));
     }
+
+    @Override
     @GetMapping("/count/{problemId}")
     public ResponseEntity<LeviathanResponse<Long>> getProblemLikeCount(@PathVariable Long problemId) {
         return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.getProblemLikeCount(problemId)));
     }
+
+    @Override
     @GetMapping("/likeCheck/{problemId}")
     public ResponseEntity<LeviathanResponse<Boolean>> checkProblemLike(@PathVariable Long problemId, @LoginId String loginId) {
         return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.checkProblemLike(problemId, loginId)));
     }
+
+    @Override
     @GetMapping("/user-liked")
     public ResponseEntity<LeviathanResponse<List<ProblemLikeResponse>>> getUserLikedProblems(@LoginId String loginId) {
         return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.getUserLikedProblems(loginId)));

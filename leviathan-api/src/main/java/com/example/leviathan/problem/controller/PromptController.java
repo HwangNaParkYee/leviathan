@@ -17,15 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class PromptController {
+public class PromptController implements PromptApi {
 
     private final PromptFacade promptFacade;
     private final ProblemFacade problemFacade;
+
+    @Override
     @PostMapping("/savePromptProblem")
     public ResponseEntity<LeviathanResponse<FindProblemResponse>> savePromptProblem(@RequestBody UserPromptRequest dto, @LoginId String loginId) {
         Long problemId = promptFacade.savePromptProblem(dto, loginId);
         return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.findProblem(problemId)));
     }
+
+    @Override
     @PostMapping("/prompt")
     public ResponseEntity<LeviathanResponse<GeneratedProblem>> generate(@RequestBody UserPromptRequest dto) {
         return ResponseEntity.ok().body(LeviathanResponse.success(promptFacade.generateProblem(dto)));

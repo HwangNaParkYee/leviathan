@@ -29,4 +29,8 @@ object Dependencies {
     object Test {
         const val JUNIT_LAUNCHER = "org.junit.platform:junit-platform-launcher"
     }
+
+	object Swagger {
+		const val SPRINGDOC = "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5"
+	}
 }
