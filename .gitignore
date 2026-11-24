@@ -40,3 +40,4 @@ out/
 /leviathan-api/src/main/resources/application.yml
 
 /docker_problems_file/*
+/docs/*
