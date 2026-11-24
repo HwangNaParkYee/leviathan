@@ -37,7 +37,7 @@ class ArticleServiceTest {
     @Test
     @DisplayName("작성자는 게시글을 수정할 수 있다")
     void update_ByWriter() {
-        Article article = new Article(problem, "title", "content", "code", writer);
+        Article article = Article.create(problem, "title", "content", "code", writer);
         when(articleRepository.findById(10L)).thenReturn(Optional.of(article));
         when(articleRepository.save(article)).thenReturn(article);
 
@@ -50,7 +50,7 @@ class ArticleServiceTest {
     @Test
     @DisplayName("작성자가 아니면 게시글을 수정/삭제할 수 없다")
     void updateAndDelete_ByOther() {
-        Article article = new Article(problem, "title", "content", "code", writer);
+        Article article = Article.create(problem, "title", "content", "code", writer);
         when(articleRepository.findById(10L)).thenReturn(Optional.of(article));
 
         BoardException onUpdate = assertThrows(BoardException.class, () -> articleService.update(10L, other, "x", "x", "x"));

@@ -1,7 +1,10 @@
 package com.example.leviathan.board.db.entity;
 
+import com.example.leviathan._common.BaseTimeEntity;
 import com.example.leviathan.member.db.entity.Member;
+
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,11 +14,8 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
-public class Comment {
-
-    @Id @GeneratedValue
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Comment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "articleId")
@@ -26,26 +26,25 @@ public class Comment {
     private Member memberId;
 
     private String content;
-    private LocalDateTime createDate;
-    private LocalDateTime updateDate;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<CommentLikes> commentLikesList = new ArrayList<>();
 
-    public Comment(Article article, Member member, String content) {
+    private Comment(final Article article, final Member member, final String content) {
         this.articleId = article;
         this.memberId = member;
         this.content = content;
-        this.createDate = LocalDateTime.now();
-        this.updateDate = this.createDate;
     }
 
-    public boolean isWrittenBy(Member member) {
+	public static Comment create(final Article article, final Member member, final String content) {
+		return new Comment(article, member, content);
+	}
+
+    public boolean isWrittenBy(final Member member) {
         return memberId.isSameMember(member);
     }
 
-    public void edit(String content) {
+    public void edit(final String content) {
         this.content = content;
-        this.updateDate = LocalDateTime.now();
     }
 }

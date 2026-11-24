@@ -25,7 +25,7 @@ public class CommentLikesService {
                 })
                 .orElseGet(() -> {
                     // 좋아요가 없으면 추가
-                    commentLikesRepository.save(new CommentLikes(comment, member));
+                    commentLikesRepository.save(CommentLikes.create(comment, member));
                     return true;
                 });
     }

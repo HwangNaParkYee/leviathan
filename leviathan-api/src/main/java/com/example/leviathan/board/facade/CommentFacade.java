@@ -60,8 +60,8 @@ public class CommentFacade {
                         comment.getArticleId().getId(),
                         comment.getMemberId().getMemberId(),
                         comment.getContent(),
-                        comment.getCreateDate(),
-                        comment.getUpdateDate(),
+                        comment.getCreatedAt(),
+                        comment.getUpdatedAt(),
                         commentLikesService.count(comment)
                 ))
                 .toList();

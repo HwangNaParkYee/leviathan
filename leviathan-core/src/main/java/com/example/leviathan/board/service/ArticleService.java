@@ -35,7 +35,7 @@ public class ArticleService {
 
     @Transactional
     public Article write(Member member, Problem problem, String title, String content, String code) {
-        return articleRepository.save(new Article(problem, title, content, code, member));
+        return articleRepository.save(Article.create(problem, title, content, code, member));
     }
 
     @Transactional

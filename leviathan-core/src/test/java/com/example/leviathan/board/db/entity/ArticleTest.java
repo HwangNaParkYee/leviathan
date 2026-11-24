@@ -17,7 +17,7 @@ class ArticleTest {
     @Test
     @DisplayName("게시글 작성자 확인")
     void article_IsWrittenBy() {
-        Article article = new Article(problem, "title", "content", "code", writer);
+        Article article = Article.create(problem, "title", "content", "code", writer);
 
         assertTrue(article.isWrittenBy(writer));
         assertFalse(article.isWrittenBy(other));
@@ -27,17 +27,15 @@ class ArticleTest {
     @Test
     @DisplayName("댓글 작성자 확인 및 수정")
     void comment_EditByWriter() {
-        Article article = new Article(problem, "title", "content", "code", writer);
-        Comment comment = new Comment(article, writer, "content");
+        Article article = Article.create(problem, "title", "content", "code", writer);
+        Comment comment = Comment.create(article, writer, "content");
 
         assertTrue(comment.isWrittenBy(writer));
         assertFalse(comment.isWrittenBy(other));
-        assertEquals(comment.getCreateDate(), comment.getUpdateDate());
 
         comment.edit("edited");
 
         assertEquals("edited", comment.getContent());
-        assertFalse(comment.getUpdateDate().isBefore(comment.getCreateDate()));
     }
 
     private Member memberWithId(Long id) {

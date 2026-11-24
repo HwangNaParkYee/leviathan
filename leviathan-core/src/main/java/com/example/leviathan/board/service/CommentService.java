@@ -37,7 +37,7 @@ public class CommentService {
     //댓글 달기
     @Transactional
     public Comment write(Member member, Article article, String content) {
-        return commentRepository.save(new Comment(article, member, content));
+        return commentRepository.save(Comment.create(article, member, content));
     }
 
     //댓글 업데이트

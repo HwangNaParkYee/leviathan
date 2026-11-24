@@ -1,8 +1,11 @@
 package com.example.leviathan.board.db.entity;
 
+import com.example.leviathan._common.BaseTimeEntity;
 import com.example.leviathan.member.db.entity.Member;
 import com.example.leviathan.problem.db.entity.Problem;
+
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,45 +13,44 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
-public class Article {
-
-    @Id @GeneratedValue
-    private Long id;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Article extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "problemId")
+    @JoinColumn(name = "problemId", nullable = false)
     private Problem problemId;
 
+	@Column(nullable = false)
     private String title;
+
+	@Column(nullable = false)
     private String content;
+
     private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(name = "memberId", nullable = false)
     private Member memberId;
 
-    private LocalDateTime createDate;
-    private LocalDateTime updateDate;
-
-    public Article(Problem problemId, String title, String content, String code, Member memberId) {
+    private Article(final Problem problemId, final String title, final String content, final String code, final Member memberId) {
         this.problemId = problemId;
         this.title = title;
         this.content = content;
         this.code = code;
         this.memberId = memberId;
-        this.createDate = LocalDateTime.now();
-        this.updateDate = this.createDate;
     }
 
-    public boolean isWrittenBy(Member member) {
+	public static Article create(final Problem problemId, final String title, final String content, final String code, final Member memberId) {
+		return new Article(problemId, title, content, code, memberId);
+	}
+
+    public boolean isWrittenBy(final Member member) {
         return memberId.isSameMember(member);
     }
 
-    public void updateArticle(String title, String content, String code) {
+    public void updateArticle(final String title, final String content, final String code) {
         this.title = title;
         this.content = content;
         this.code = code;
-        this.updateDate = LocalDateTime.now();
     }
 }
