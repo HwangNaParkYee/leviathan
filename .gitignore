@@ -37,6 +37,7 @@ out/
 .vscode/
 
 # .gitignore
-/src/main/resources/application.yml
+/leviathan-api/src/main/resources/application.yml
 
 /docker_problems_file/*
+/docs/*
