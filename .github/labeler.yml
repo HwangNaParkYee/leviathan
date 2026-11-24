@@ -1,0 +1,11 @@
+'✨feat✨':
+  - head-branch: ['^feat', 'feat']
+
+'🛠️ fix 🛠️':
+  - head-branch: ['^fix', 'fix', '^hotfix', 'hotfix']
+
+'✨refac✨':
+  - head-branch: ['^refac', 'refac']
+
+chore:
+  - head-branch: ['^chore', 'chore', '^docs', 'docs']
