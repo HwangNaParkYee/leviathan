@@ -5,8 +5,8 @@ import com.example.leviathan.member.exception.MemberException;
 import com.example.leviathan.common.AccessTokenCookie;
 import com.example.leviathan.common.JwtUtility;
 import com.example.leviathan.member.db.entity.Member;
-import com.example.leviathan.member.dto.LoginDTO;
-import com.example.leviathan.member.dto.SignUpDTO;
+import com.example.leviathan.member.controller.request.LoginRequest;
+import com.example.leviathan.member.controller.request.SignUpRequest;
 import com.example.leviathan.member.service.MemberService;
 import com.example.leviathan.member.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +34,10 @@ public class MemberFacade {
     // 서비스가 던진 예외를 여기서 응답으로 바꾸므로 Facade에서는 트랜잭션을 열지 않는다
     // (트랜잭션을 열면 rollback-only로 표시되어 응답 대신 500이 나간다)
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public ResponseEntity<String> signUp(SignUpDTO dto) {
+    public ResponseEntity<String> signUp(SignUpRequest dto) {
         try {
             // 비밀번호 암호화 후 회원 저장
-            memberService.register(dto.getMemberId(), passwordEncoder.encode(dto.getPassword()));
+            memberService.register(dto.memberId(), passwordEncoder.encode(dto.password()));
             return ResponseEntity.ok("회원가입 성공");
         } catch (MemberException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -49,15 +49,15 @@ public class MemberFacade {
     }
 
     @Transactional
-    public ResponseEntity<Object> login(LoginDTO dto) {
+    public ResponseEntity<Object> login(LoginRequest dto) {
         // 사용자 ID로 회원 정보를 찾음
-        Member member = memberService.findByLoginId(dto.getMemberId());
+        Member member = memberService.findByLoginId(dto.memberId());
 
         // 회원이 존재하고, 비밀번호가 일치하는지 확인
-        if (member != null && passwordEncoder.matches(dto.getPassword(), member.getPassword())) {
+        if (member != null && passwordEncoder.matches(dto.password(), member.getPassword())) {
             // 비밀번호가 맞다면 JWT 토큰을 생성
-            String accessToken = jwtUtility.generateToken(dto.getMemberId(), member.getRole());
-            String refreshToken = jwtUtility.generateRefreshToken(dto.getMemberId());
+            String accessToken = jwtUtility.generateToken(dto.memberId(), member.getRole());
+            String refreshToken = jwtUtility.generateRefreshToken(dto.memberId());
 
             refreshTokenService.issue(member, refreshToken, LocalDateTime.now().plus(JwtUtility.REFRESH_TOKEN_VALIDITY));
 

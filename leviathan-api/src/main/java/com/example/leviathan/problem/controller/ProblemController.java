@@ -1,11 +1,11 @@
 package com.example.leviathan.problem.controller;
 
-import com.example.leviathan.problem.dto.FindByAllProblemDTO;
-import com.example.leviathan.problem.dto.FindProblemDTO;
-import com.example.leviathan.problem.dto.MyProblemDTO;
-import com.example.leviathan.problem.dto.SaveProblemDTO;
-import com.example.leviathan.problem.dto.SubmitProblemDTO;
-import com.example.leviathan.problem.dto.UpdateProblemDTO;
+import com.example.leviathan.problem.facade.response.FindByAllProblemResponse;
+import com.example.leviathan.problem.facade.response.FindProblemResponse;
+import com.example.leviathan.problem.facade.response.MyProblemResponse;
+import com.example.leviathan.problem.controller.request.SaveProblemRequest;
+import com.example.leviathan.problem.controller.request.SubmitProblemRequest;
+import com.example.leviathan.problem.controller.request.UpdateProblemRequest;
 
 
 import com.example.leviathan.problem.db.entity.Problem;
@@ -25,30 +25,30 @@ public class ProblemController {
     private final ProblemFacade problemFacade;
 
     @PostMapping("/saveProblem")
-    public ResponseEntity<String> saveProblem(@RequestBody SaveProblemDTO dto){
+    public ResponseEntity<String> saveProblem(@RequestBody SaveProblemRequest dto){
         return problemFacade.saveProblem(dto);
     }
 
 
     @GetMapping("/findProblem/{problemId}")
-    public ResponseEntity<FindProblemDTO> findProblem(@PathVariable Long problemId){
+    public ResponseEntity<FindProblemResponse> findProblem(@PathVariable Long problemId){
         return problemFacade.findProblem(problemId);
     }
 
     @GetMapping("/findByProblemNumber/{problemNumber}")
-    public ResponseEntity<FindProblemDTO> findByProblemNumber(@PathVariable Long problemNumber){
+    public ResponseEntity<FindProblemResponse> findByProblemNumber(@PathVariable Long problemNumber){
         return problemFacade.findByProblemNumber(problemNumber);
     }
 
 
     @GetMapping("/public/findByAllProblem")
-    public ResponseEntity<List<FindByAllProblemDTO>> findByAllProblem(){
-        List<FindByAllProblemDTO> problems = problemFacade.findByAllProblem();
+    public ResponseEntity<List<FindByAllProblemResponse>> findByAllProblem(){
+        List<FindByAllProblemResponse> problems = problemFacade.findByAllProblem();
         return ResponseEntity.ok(problems);
     }
 
     @PutMapping("/updateProblem")
-    public ResponseEntity<String> updateProblem(@RequestBody UpdateProblemDTO dto) {
+    public ResponseEntity<String> updateProblem(@RequestBody UpdateProblemRequest dto) {
         try {
             problemFacade.updateProblem(dto);
             return ResponseEntity.ok("Problem updated successfully");
@@ -58,14 +58,14 @@ public class ProblemController {
     }
 
     @PostMapping("/runProblem")
-    public ResponseEntity<String> runProblem(@RequestBody SubmitProblemDTO dto) {
+    public ResponseEntity<String> runProblem(@RequestBody SubmitProblemRequest dto) {
         String result = problemFacade.runProblem(dto);
         return ResponseEntity.ok(result);
     }
 
 
     @PostMapping("/submitProblem")
-    public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemDTO dto, @LoginId String loginId) {
+    public ResponseEntity<String> submitProblem(@RequestBody SubmitProblemRequest dto, @LoginId String loginId) {
         String result = problemFacade.submitProblem(loginId, dto);
         return ResponseEntity.ok(result);
     }
@@ -77,8 +77,8 @@ public class ProblemController {
     }
 
     @GetMapping("/findMyProblem")
-    public ResponseEntity<List<MyProblemDTO>> getAllMyProblemNumbers(@LoginId String loginId) {
-        List<MyProblemDTO> Problems = problemFacade.getAllMyProblemNumbers(loginId);
+    public ResponseEntity<List<MyProblemResponse>> getAllMyProblemNumbers(@LoginId String loginId) {
+        List<MyProblemResponse> Problems = problemFacade.getAllMyProblemNumbers(loginId);
         return ResponseEntity.ok(Problems);
     }
 

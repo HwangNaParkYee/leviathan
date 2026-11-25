@@ -1,5 +1,6 @@
 package com.example.leviathan.common.advice;
 
+import com.example.leviathan.common.LeviathanResponse;
 import com.example.leviathan.common.exception.BusinessException;
 import com.example.leviathan.common.exception.ErrorCode;
 import com.example.leviathan.common.exception.UnauthorizedException;
@@ -15,18 +16,17 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	// Custom Exception
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<Map<String, String>> handleUnauthorized(UnauthorizedException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
-    }
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Map<String, String>> handleBusiness(BusinessException e) {
-        ErrorCode errorCode = e.getErrorCode();
-        return ResponseEntity.status(resolveStatus(errorCode))
-                .body(Map.of("code", errorCode.getCode(), "message", errorCode.getMessage()));
+    public ResponseEntity<LeviathanResponse<Void>> handleBusiness(BusinessException e) {
+        log.info("Business exception occurred: {}", e.getMessage());
+        return ResponseEntity.status(resolveStatus(e.getErrorCode())).body(LeviathanResponse.fail(e.getErrorCode()));
     }
+
+	@ExceptionHandler(UnauthorizedException.class)
+	public ResponseEntity<Map<String, String>> handleUnauthorized(UnauthorizedException e) {
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+	}
 
     private HttpStatus resolveStatus(ErrorCode errorCode) {
         try {

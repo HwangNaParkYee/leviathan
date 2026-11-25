@@ -1,8 +1,8 @@
 package com.example.leviathan.member.controller;
 
 
-import com.example.leviathan.member.dto.LoginDTO;
-import com.example.leviathan.member.dto.SignUpDTO;
+import com.example.leviathan.member.controller.request.LoginRequest;
+import com.example.leviathan.member.controller.request.SignUpRequest;
 import com.example.leviathan.member.facade.MemberFacade;
 import com.example.leviathan.common.AccessTokenCookie;
 import com.example.leviathan.common.annotation.LoginId;
@@ -26,7 +26,7 @@ public class MemberController {
 
 
     @PostMapping("/signUp")
-    public ResponseEntity<String> signUp(@RequestBody SignUpDTO dto){
+    public ResponseEntity<String> signUp(@RequestBody SignUpRequest dto){
         return memberFacade.signUp(dto);
     }
 
@@ -40,7 +40,7 @@ public class MemberController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginDTO dto){
+    public ResponseEntity<Object> login(@RequestBody LoginRequest dto){
         return memberFacade.login(dto);
     }
 

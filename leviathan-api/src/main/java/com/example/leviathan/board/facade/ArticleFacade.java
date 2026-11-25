@@ -4,12 +4,12 @@ import com.example.leviathan.board.exception.BoardErrorCode;
 import com.example.leviathan.board.exception.BoardException;
 
 import com.example.leviathan.board.db.entity.Article;
-import com.example.leviathan.board.dto.ArticleUpdateDTO;
-import com.example.leviathan.board.dto.FindByAllArticleDTO;
-import com.example.leviathan.board.dto.FindByArticleDTO;
-import com.example.leviathan.board.dto.FindByProblemDTO;
-import com.example.leviathan.board.dto.SaveArticleDTO;
-import com.example.leviathan.board.dto.SaveResDTO;
+import com.example.leviathan.board.controller.request.UpdateArticleRequest;
+import com.example.leviathan.board.facade.response.FindByAllArticleResponse;
+import com.example.leviathan.board.facade.response.FindByArticleResponse;
+import com.example.leviathan.board.facade.response.FindByProblemResponse;
+import com.example.leviathan.board.controller.request.SaveArticleRequest;
+import com.example.leviathan.board.facade.response.SaveArticleResponse;
 import com.example.leviathan.board.service.ArticleLikesService;
 import com.example.leviathan.board.service.ArticleService;
 import com.example.leviathan.board.service.CommentService;
@@ -37,15 +37,15 @@ public class ArticleFacade {
     private final MemberService memberService;
 
     @Transactional
-    public ResponseEntity<SaveResDTO> saveArticle(String loginId, SaveArticleDTO dto) {
+    public ResponseEntity<SaveArticleResponse> saveArticle(String loginId, SaveArticleRequest dto) {
         Member member = memberService.findByLoginId(loginId);
 
         // 요청의 problemId는 문제 번호(number)다
-        Problem problem = problemService.findByNumber(dto.getProblemId()).orElse(null);
+        Problem problem = problemService.findByNumber(dto.problemId()).orElse(null);
 
-        Article article = articleService.write(member, problem, dto.getTitle(), dto.getContent(), dto.getCode());
+        Article article = articleService.write(member, problem, dto.title(), dto.content(), dto.code());
 
-        return ResponseEntity.ok(new SaveResDTO(article.getProblemId().getNumber(), article.getTitle(), article.getContent()));
+        return ResponseEntity.ok(new SaveArticleResponse(article.getProblemId().getNumber(), article.getTitle(), article.getContent()));
     }
 
     @Transactional
@@ -57,11 +57,11 @@ public class ArticleFacade {
     // 서비스가 던진 예외를 여기서 응답으로 바꾸므로 Facade에서는 트랜잭션을 열지 않는다
     // (트랜잭션을 열면 rollback-only로 표시되어 응답 대신 500이 나간다)
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public ResponseEntity<String> updateArticle(String loginId, ArticleUpdateDTO dto, Long articleId) {
+    public ResponseEntity<String> updateArticle(String loginId, UpdateArticleRequest dto, Long articleId) {
         Member member = memberService.findByLoginId(loginId);
 
         try {
-            articleService.update(articleId, member, dto.getTitle(), dto.getContent(), dto.getCode());
+            articleService.update(articleId, member, dto.title(), dto.content(), dto.code());
         } catch (BoardException e) {
             if (e.getErrorCode() != BoardErrorCode.ARTICLE_ACCESS_DENIED) {
                 throw e;
@@ -72,34 +72,34 @@ public class ArticleFacade {
         return ResponseEntity.ok("게시물이 수정되었습니다.");
     }
 
-    public ResponseEntity<FindByArticleDTO> findByArticle(Long articleId) {
+    public ResponseEntity<FindByArticleResponse> findByArticle(Long articleId) {
         Article article = articleService.getById(articleId);
-        return ResponseEntity.ok(new FindByArticleDTO(article, articleLikesService.count(article)));
+        return ResponseEntity.ok(FindByArticleResponse.of(article, articleLikesService.count(article)));
     }
 
-    public ResponseEntity<List<FindByAllArticleDTO>> findByAllArticle() {
-        List<FindByAllArticleDTO> articleDTO = articleService.findAll().stream()
-                .map(article -> new FindByAllArticleDTO(
+    public ResponseEntity<List<FindByAllArticleResponse>> findByAllArticle() {
+        List<FindByAllArticleResponse> responses = articleService.findAll().stream()
+                .map(article -> FindByAllArticleResponse.of(
                         article,
                         articleLikesService.count(article),     // 좋아요 수
                         commentService.countByArticle(article)  // 댓글 수
                 ))
                 .toList();
 
-        return ResponseEntity.ok(articleDTO);
+        return ResponseEntity.ok(responses);
     }
 
-    public ResponseEntity<List<FindByProblemDTO>> findByProblemId(Long problemId) {
+    public ResponseEntity<List<FindByProblemResponse>> findByProblemId(Long problemId) {
         Problem problem = problemService.getById(problemId);
 
-        List<FindByProblemDTO> articleDTO = articleService.findByProblem(problem).stream()
-                .map(article -> new FindByProblemDTO(
+        List<FindByProblemResponse> responses = articleService.findByProblem(problem).stream()
+                .map(article -> FindByProblemResponse.of(
                         article,
                         articleLikesService.count(article),
                         commentService.countByArticle(article)
                 ))
                 .toList();
 
-        return ResponseEntity.ok(articleDTO);
+        return ResponseEntity.ok(responses);
     }
 }

@@ -1,11 +1,11 @@
 package com.example.leviathan.board.controller;
 
-import com.example.leviathan.board.dto.ArticleUpdateDTO;
-import com.example.leviathan.board.dto.FindByAllArticleDTO;
-import com.example.leviathan.board.dto.FindByArticleDTO;
-import com.example.leviathan.board.dto.FindByProblemDTO;
-import com.example.leviathan.board.dto.SaveArticleDTO;
-import com.example.leviathan.board.dto.SaveResDTO;
+import com.example.leviathan.board.controller.request.UpdateArticleRequest;
+import com.example.leviathan.board.facade.response.FindByAllArticleResponse;
+import com.example.leviathan.board.facade.response.FindByArticleResponse;
+import com.example.leviathan.board.facade.response.FindByProblemResponse;
+import com.example.leviathan.board.controller.request.SaveArticleRequest;
+import com.example.leviathan.board.facade.response.SaveArticleResponse;
 
 import com.example.leviathan.board.facade.ArticleFacade;
 import com.example.leviathan.common.annotation.LoginId;
@@ -24,27 +24,27 @@ public class ArticleController {
 
 
     @GetMapping("/findByAll")
-    public ResponseEntity<List<FindByAllArticleDTO>> findByAll() {
+    public ResponseEntity<List<FindByAllArticleResponse>> findByAll() {
         return articleFacade.findByAllArticle();
     }
 
     @GetMapping("/get/{articleId}")
-    public ResponseEntity<FindByArticleDTO> getArticle(@PathVariable Long articleId) {
+    public ResponseEntity<FindByArticleResponse> getArticle(@PathVariable Long articleId) {
         return articleFacade.findByArticle(articleId);
     }
 
     @GetMapping("/findByProblemId/{problemId}")
-    public ResponseEntity<List<FindByProblemDTO>> findByProblemId(@PathVariable Long problemId) {
+    public ResponseEntity<List<FindByProblemResponse>> findByProblemId(@PathVariable Long problemId) {
         return articleFacade.findByProblemId(problemId);
     }
 
     @PostMapping("/save")
-    public ResponseEntity<SaveResDTO> save(@RequestBody SaveArticleDTO dto,  @LoginId String loginId) {
+    public ResponseEntity<SaveArticleResponse> save(@RequestBody SaveArticleRequest dto,  @LoginId String loginId) {
         return articleFacade.saveArticle(loginId, dto);
     }
 
     @PutMapping("/update/{articleId}")
-    public ResponseEntity<String> update(@PathVariable Long articleId, @RequestBody ArticleUpdateDTO dto, @LoginId String loginId) {
+    public ResponseEntity<String> update(@PathVariable Long articleId, @RequestBody UpdateArticleRequest dto, @LoginId String loginId) {
         return articleFacade.updateArticle(loginId, dto, articleId);
     }
 

@@ -1,6 +1,6 @@
 package com.example.leviathan.problem.controller;
 
-import com.example.leviathan.problem.dto.ProblemLikeDTO;
+import com.example.leviathan.problem.facade.response.ProblemLikeResponse;
 import com.example.leviathan.problem.facade.ProblemFacade;
 import com.example.leviathan.common.annotation.LoginId;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +37,8 @@ public class ProblemLikesController {
     
     // 사용자가 좋아요한 문제들 조회
     @GetMapping("/user-liked")
-    public ResponseEntity<List<ProblemLikeDTO>> getUserLikedProblems(@LoginId String loginId) {
-        List<ProblemLikeDTO> likedProblems = problemFacade.getUserLikedProblems(loginId);
+    public ResponseEntity<List<ProblemLikeResponse>> getUserLikedProblems(@LoginId String loginId) {
+        List<ProblemLikeResponse> likedProblems = problemFacade.getUserLikedProblems(loginId);
         return ResponseEntity.ok(likedProblems);
     }
 }

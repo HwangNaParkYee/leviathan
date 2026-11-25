@@ -1,9 +1,9 @@
 package com.example.leviathan.problem.controller;
 
 
-import com.example.leviathan.problem.dto.FindProblemDTO;
+import com.example.leviathan.problem.facade.response.FindProblemResponse;
 import com.example.leviathan.problem.model.GeneratedProblem;
-import com.example.leviathan.problem.dto.UserPromptDTO;
+import com.example.leviathan.problem.controller.request.UserPromptRequest;
 import com.example.leviathan.problem.facade.ProblemFacade;
 import com.example.leviathan.problem.facade.PromptFacade;
 import com.example.leviathan.common.annotation.LoginId;
@@ -25,8 +25,8 @@ public class PromptController {
     private final ProblemFacade problemFacade;
 
     @PostMapping("/savePromptProblem")
-    public ResponseEntity<?> savePromptProblem(@RequestBody UserPromptDTO dto, @LoginId String loginId) {
-        boolean isValid = promptFacade.isValidPrompt(dto.getPrompt());
+    public ResponseEntity<?> savePromptProblem(@RequestBody UserPromptRequest dto, @LoginId String loginId) {
+        boolean isValid = promptFacade.isValidPrompt(dto.prompt());
 
         if(!isValid) {
             return ResponseEntity
@@ -38,7 +38,7 @@ public class PromptController {
     }
 
     @PostMapping("/prompt")
-    public ResponseEntity<GeneratedProblem> generate(@RequestBody UserPromptDTO dto) {
+    public ResponseEntity<GeneratedProblem> generate(@RequestBody UserPromptRequest dto) {
         GeneratedProblem result = promptFacade.generateProblem(dto);
         return ResponseEntity.ok(result);
     }

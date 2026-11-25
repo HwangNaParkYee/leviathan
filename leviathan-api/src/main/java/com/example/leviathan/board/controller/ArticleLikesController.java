@@ -1,6 +1,5 @@
 package com.example.leviathan.board.controller;
 
-import com.example.leviathan.board.dto.ArticleLikesDTO;
 import com.example.leviathan.board.facade.ArticleLikesFacade;
 import com.example.leviathan.common.annotation.LoginId;
 import lombok.RequiredArgsConstructor;
