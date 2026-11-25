@@ -17,22 +17,30 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/comments")
 @RequiredArgsConstructor
-public class CommentController {
+public class CommentController implements CommentApi {
 
     private final CommentFacade commentFacade;
+
+    @Override
     @PostMapping("/save")
     public ResponseEntity<LeviathanResponse<SaveCommentResponse>> saveComment(@RequestBody SaveCommentRequest dto, @LoginId String loginId) {
         return ResponseEntity.ok().body(LeviathanResponse.success(commentFacade.saveComment(dto, loginId)));
     }
+
+    @Override
     @PutMapping("/update/{commentId}")
     public ResponseEntity<LeviathanResponse<UpdateCommentResponse>> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentRequest dto, @LoginId String loginId) {
         return ResponseEntity.ok().body(LeviathanResponse.success(commentFacade.updateComment(commentId, dto, loginId)));
     }
+
+    @Override
     @DeleteMapping("/delete/{commentId}")
     public ResponseEntity<LeviathanResponse<Void>> deleteComment(@PathVariable Long commentId, @LoginId String loginId) {
         commentFacade.deleteComment(commentId, loginId);
         return ResponseEntity.ok().body(LeviathanResponse.success());
     }
+
+    @Override
     @GetMapping("/article/{articleId}")
     public ResponseEntity<LeviathanResponse<List<FindByArticleIdCommentResponse>>> getCommentsByArticleId(@PathVariable Long articleId) {
         return ResponseEntity.ok().body(LeviathanResponse.success(commentFacade.getCommentsByArticleId(articleId)));
