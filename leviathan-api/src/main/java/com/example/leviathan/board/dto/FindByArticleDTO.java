@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -19,7 +19,7 @@ public class FindByArticleDTO {
     private String code;
     private String memberName;
     private Long likes;
-    private LocalDateTime updateDate;
+    private Instant updateDate;
 
     public FindByArticleDTO(Article article, Long likes) {
         this.articleId = article.getId();
@@ -30,6 +30,6 @@ public class FindByArticleDTO {
         this.code = article.getCode();
         this.memberName = article.getMemberId().getMemberId();
         this.likes = likes;
-        this.updateDate = article.getUpdateDate();
+        this.updateDate = article.getUpdatedAt();
     }
 }

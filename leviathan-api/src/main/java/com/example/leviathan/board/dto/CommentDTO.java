@@ -3,7 +3,7 @@ package com.example.leviathan.board.dto;
 import com.example.leviathan.board.db.entity.Comment;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 public class CommentDTO {
@@ -11,13 +11,13 @@ public class CommentDTO {
     private final String content;
     private final Long articleId;
     private final String memberId;
-    private final LocalDateTime createdAt;
+    private final Instant createdAt;
 
     public CommentDTO(Comment comment) {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.articleId = comment.getArticleId().getId();
         this.memberId = comment.getMemberId().getMemberId();
-        this.createdAt = comment.getCreateDate();
+        this.createdAt = comment.getCreatedAt();
     }
 }

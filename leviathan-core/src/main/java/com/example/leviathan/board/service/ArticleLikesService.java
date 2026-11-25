@@ -25,7 +25,7 @@ public class ArticleLikesService {
             articleLikesRepository.delete(articleLikes.get());
             return false;
         }
-        articleLikesRepository.save(new ArticleLikes(article, member));
+        articleLikesRepository.save(ArticleLikes.create(article, member));
         return true;
     }
 

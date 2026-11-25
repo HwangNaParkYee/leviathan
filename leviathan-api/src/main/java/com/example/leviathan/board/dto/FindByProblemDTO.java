@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +16,7 @@ public class FindByProblemDTO {
     private Long problemNumber;
     private String title;
     private String memberId;
-    private LocalDateTime updateDate;
+    private Instant updateDate;
     private Long likes;
     private Long commentNumbers;
 
@@ -26,7 +26,7 @@ public class FindByProblemDTO {
         this.problemId = article.getProblemId().getId();
         this.title = article.getTitle();
         this.memberId = article.getMemberId().getMemberId();
-        this.updateDate = article.getUpdateDate();
+        this.updateDate = article.getUpdatedAt();
         this.likes = likes;
         this.commentNumbers = commentNumbers;
     }
