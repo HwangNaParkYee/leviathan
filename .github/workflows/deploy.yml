@@ -57,7 +57,7 @@ jobs:
           name: cicdsample
 
       - name: 🔐 Setup SSH agent
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.MY_PEM_KEY }}
 
