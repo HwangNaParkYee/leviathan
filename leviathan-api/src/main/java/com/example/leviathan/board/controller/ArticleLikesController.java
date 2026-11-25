@@ -1,6 +1,7 @@
 package com.example.leviathan.board.controller;
 
 import com.example.leviathan.board.facade.ArticleLikesFacade;
+import com.example.leviathan.common.LeviathanResponse;
 import com.example.leviathan.common.annotation.LoginId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -10,15 +11,15 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ArticleLikesController {
+
     private final ArticleLikesFacade articleLikesFacade;
-
     @PostMapping("/article/likeUp/{articleId}")
-    public ResponseEntity<String> likeUp(@PathVariable Long articleId, @LoginId String loginId) {
-        return articleLikesFacade.toggleLike(loginId, articleId);
+    public ResponseEntity<LeviathanResponse<Void>> likeUp(@PathVariable Long articleId, @LoginId String loginId) {
+        articleLikesFacade.toggleLike(loginId, articleId);
+        return ResponseEntity.ok().body(LeviathanResponse.success());
     }
-
     @GetMapping("article/likeCheck/{articleId}")
-    public ResponseEntity<String> findByArticleIdMemberArticleLike(@PathVariable Long articleId, @LoginId String loginId){
-        return articleLikesFacade.findByArticleIdMemberArticleLike(loginId, articleId);
+    public ResponseEntity<LeviathanResponse<Boolean>> findByArticleIdMemberArticleLike(@PathVariable Long articleId, @LoginId String loginId) {
+        return ResponseEntity.ok().body(LeviathanResponse.success(articleLikesFacade.isLiked(loginId, articleId)));
     }
 }

@@ -1,20 +1,18 @@
 package com.example.leviathan.problem.controller;
 
-
-import com.example.leviathan.problem.facade.response.FindProblemResponse;
-import com.example.leviathan.problem.model.GeneratedProblem;
+import com.example.leviathan.common.LeviathanResponse;
+import com.example.leviathan.common.annotation.LoginId;
 import com.example.leviathan.problem.controller.request.UserPromptRequest;
 import com.example.leviathan.problem.facade.ProblemFacade;
 import com.example.leviathan.problem.facade.PromptFacade;
-import com.example.leviathan.common.annotation.LoginId;
+import com.example.leviathan.problem.facade.response.FindProblemResponse;
+import com.example.leviathan.problem.model.GeneratedProblem;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,23 +21,13 @@ public class PromptController {
 
     private final PromptFacade promptFacade;
     private final ProblemFacade problemFacade;
-
     @PostMapping("/savePromptProblem")
-    public ResponseEntity<?> savePromptProblem(@RequestBody UserPromptRequest dto, @LoginId String loginId) {
-        boolean isValid = promptFacade.isValidPrompt(dto.prompt());
-
-        if(!isValid) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(Map.of("error", "요청하신 내용은 리눅스 실습 문제로 부적절합니다."));
-        }
-        Long problemNumber =  promptFacade.savePromptProblem(dto, loginId);
-        return problemFacade.findProblem(problemNumber);
+    public ResponseEntity<LeviathanResponse<FindProblemResponse>> savePromptProblem(@RequestBody UserPromptRequest dto, @LoginId String loginId) {
+        Long problemId = promptFacade.savePromptProblem(dto, loginId);
+        return ResponseEntity.ok().body(LeviathanResponse.success(problemFacade.findProblem(problemId)));
     }
-
     @PostMapping("/prompt")
-    public ResponseEntity<GeneratedProblem> generate(@RequestBody UserPromptRequest dto) {
-        GeneratedProblem result = promptFacade.generateProblem(dto);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<LeviathanResponse<GeneratedProblem>> generate(@RequestBody UserPromptRequest dto) {
+        return ResponseEntity.ok().body(LeviathanResponse.success(promptFacade.generateProblem(dto)));
     }
 }

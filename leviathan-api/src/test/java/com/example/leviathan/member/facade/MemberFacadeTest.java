@@ -15,9 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -54,12 +51,9 @@ class MemberFacadeTest {
         when(passwordEncoder.encode("password123")).thenReturn("encrypted");
 
         // when (실행)
-        ResponseEntity<String> response = memberFacade.signUp(dto);
+        memberFacade.signUp(dto);
 
         // then (검증)
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("회원가입 성공", response.getBody());
-
         // 암호화된 비밀번호로 가입했는지 확인
         verify(memberService, times(1)).register("testUser", "encrypted");
     }
@@ -73,11 +67,10 @@ class MemberFacadeTest {
         when(memberService.register("duplicateUser", "encrypted")).thenThrow(new MemberException(MemberErrorCode.MEMBER_ALREADY_REGISTERED));
 
         // when
-        ResponseEntity<String> response = memberFacade.signUp(dto);
+        MemberException exception = assertThrows(MemberException.class, () -> memberFacade.signUp(dto));
 
         // then
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("이미 사용 중인 회원 ID입니다.", response.getBody());
+        assertEquals(MemberErrorCode.MEMBER_ALREADY_REGISTERED, exception.getErrorCode());
     }
 
     @Test
@@ -91,11 +84,9 @@ class MemberFacadeTest {
         when(jwtUtility.generateToken(anyString(), any())).thenReturn("accessToken");
         when(jwtUtility.generateRefreshToken(anyString())).thenReturn("refreshToken");
 
-        ResponseEntity<Object> response = memberFacade.login(dto);
+        String accessToken = memberFacade.login(dto);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("로그인 성공", response.getBody());
-        assertTrue(response.getHeaders().getFirst(HttpHeaders.SET_COOKIE).startsWith("accessToken=accessToken"));
+        assertEquals("accessToken", accessToken);
 
         // RefreshToken을 새로 발급했는지 확인
         verify(refreshTokenService, times(1)).issue(eq(member), eq("refreshToken"), any(LocalDateTime.class));
@@ -110,9 +101,9 @@ class MemberFacadeTest {
         when(memberService.findByLoginId("testUser")).thenReturn(member);
         when(passwordEncoder.matches("wrong", "encryptedpassword")).thenReturn(false);
 
-        ResponseEntity<Object> response = memberFacade.login(dto);
+        MemberException exception = assertThrows(MemberException.class, () -> memberFacade.login(dto));
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(MemberErrorCode.LOGIN_FAILED, exception.getErrorCode());
         verify(refreshTokenService, never()).issue(any(), any(), any());
     }
 }
